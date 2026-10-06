@@ -1,0 +1,73 @@
+:host {
+  --tam: var(--avatar-tamano, 48px);
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--tam);
+  height: var(--tam);
+  flex-shrink: 0;
+}
+
+.disco {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(160deg, var(--color-primario-2), var(--color-primario-1));
+  color: var(--color-primario-contraste);
+  font-family: var(--font-display);
+  font-weight: var(--peso-display);
+  font-size: calc(var(--tam) * 0.38);
+  box-shadow: var(--shadow-brillo);
+}
+
+/* Halo de sol detrás del disco: rayos que giran despacio. */
+.halo {
+  position: absolute;
+  inset: -40%;
+  display: grid;
+  place-items: center;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.halo__rayos {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(var(--brillo-2) 0 6deg, transparent 6deg 30deg);
+  -webkit-mask: radial-gradient(circle, transparent 38%, #000 40%, transparent 70%);
+  mask: radial-gradient(circle, transparent 38%, #000 40%, transparent 70%);
+  animation: girar-halo 18s linear infinite;
+}
+
+/* Amanecer: el sol sube por detrás y los rayos se abren. */
+:host(.amanecer) .halo {
+  animation: halo-sale 1.6s var(--easing-salida) 300ms both;
+}
+
+:host(.amanecer) .disco {
+  animation: disco-sale 1s var(--easing-resorte) 200ms both;
+}
+
+@keyframes girar-halo {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes halo-sale {
+  from {
+    opacity: 0;
+    transform: translateY(60%) scale(0.4);
+  }
+}
+
+@keyframes disco-sale {
+  from {
+    opacity: 0;
+    transform: translateY(40%) scale(0.7);
+  }
+}

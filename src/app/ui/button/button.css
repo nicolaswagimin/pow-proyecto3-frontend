@@ -1,0 +1,236 @@
+:host {
+  display: inline-block;
+}
+
+:host(.ancho-completo) {
+  display: block;
+}
+
+.boton {
+  --boton-texto: var(--color-texto);
+  --boton-borde: transparent;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  min-width: 52px;
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--boton-texto);
+  font-weight: var(--peso-fuerte);
+  letter-spacing: 0.01em;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--duracion-media) var(--easing-resorte),
+    box-shadow var(--duracion-media);
+}
+
+:host(.ancho-completo) .boton {
+  width: 100%;
+}
+
+.boton--compacto {
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.fondo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1.5px var(--boton-borde);
+}
+
+.contenido {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition:
+    opacity var(--duracion-media),
+    transform var(--duracion-lenta) var(--easing-resorte);
+}
+
+/* ---------- Primario: degradado coral→mango que fluye sin fin ---------- */
+.boton--primario {
+  --boton-texto: var(--color-primario-contraste);
+  box-shadow: var(--shadow-brillo);
+}
+
+/* El degradado mide el triple del botón y se desplaza con transform (sin repintar). */
+.flujo {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 300%;
+  display: none;
+  background: linear-gradient(
+    90deg,
+    var(--color-primario-1),
+    var(--color-primario-2),
+    var(--color-primario-1),
+    var(--color-primario-2)
+  );
+  animation: fluir 6s linear infinite;
+}
+
+.boton--primario .flujo {
+  display: block;
+}
+
+/* Destello: una franja de luz que cruza el botón al pasar el mouse. */
+.destello {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 35%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.65), transparent);
+  transform: translateX(0) skewX(-18deg);
+  opacity: 0;
+}
+
+.boton--secundario {
+  --boton-borde: var(--color-borde);
+}
+
+.boton--secundario .fondo {
+  background: var(--color-superficie);
+}
+
+.boton--fantasma {
+  --boton-texto: var(--color-enlace);
+}
+
+.boton--peligro {
+  --boton-borde: var(--color-error);
+  --boton-texto: var(--color-error);
+}
+
+/* ---------- Estados ---------- */
+@media (hover: hover) {
+  .boton:not(:disabled):not(.cargando):hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .boton:not(:disabled):not(.cargando):hover .destello {
+    animation: destellar 900ms var(--easing-salida);
+  }
+
+  .boton--secundario:not(:disabled):hover .fondo,
+  .boton--fantasma:not(:disabled):hover .fondo {
+    background: color-mix(in srgb, var(--color-primario-1) 16%, var(--color-superficie));
+  }
+
+  .boton--peligro:not(:disabled):hover .fondo {
+    background: color-mix(in srgb, var(--color-error) 12%, transparent);
+  }
+}
+
+.boton:not(:disabled):not(.cargando):active {
+  transform: scale(0.96);
+  transition-duration: 60ms;
+}
+
+.boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.boton:disabled .flujo {
+  animation: none;
+  filter: grayscale(0.6);
+}
+
+/* ---------- Cargando: el contenido se pone y sale un sol que gira con rayos que laten ---------- */
+.cargando {
+  cursor: progress;
+}
+
+.cargando .contenido {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.cargando .flujo {
+  animation-duration: 1.4s;
+}
+
+.sol {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px;
+  opacity: 0;
+  transform: translateY(18px) scale(0.6);
+  transition:
+    opacity var(--duracion-media),
+    transform var(--duracion-lenta) var(--easing-resorte);
+  pointer-events: none;
+}
+
+.cargando .sol {
+  opacity: 1;
+  transform: none;
+}
+
+.sol__disco {
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: var(--boton-texto);
+}
+
+.sol__rayos {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(var(--boton-texto) 0 10deg, transparent 10deg 45deg);
+  -webkit-mask: radial-gradient(circle, transparent 52%, #000 54%);
+  mask: radial-gradient(circle, transparent 52%, #000 54%);
+  animation:
+    girar 2.4s linear infinite,
+    latir 900ms var(--easing-suave) infinite alternate;
+}
+
+/* Se desplaza dos tercios (el ancho de un ciclo coral→mango) para que el bucle no se note. */
+@keyframes fluir {
+  to {
+    transform: translateX(-66.6667%);
+  }
+}
+
+@keyframes destellar {
+  0% {
+    opacity: 1;
+    transform: translateX(0) skewX(-18deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(450%) skewX(-18deg);
+  }
+}
+
+@keyframes girar {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes latir {
+  from {
+    scale: 0.82;
+  }
+  to {
+    scale: 1.08;
+  }
+}

@@ -1,0 +1,228 @@
+/* Estilos compartidos por ui-text-field y ui-password-field. */
+
+:host {
+  display: block;
+  --campo-pad: var(--space-5);
+  --campo-alto: 58px;
+}
+
+.campo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: var(--campo-alto);
+  border-radius: var(--radius-control);
+  background: var(--color-campo);
+  box-shadow: inset 0 0 0 1.5px var(--color-borde);
+  transition: box-shadow var(--duracion-media);
+}
+
+.campo--con-icono {
+  --campo-pad: 3rem;
+}
+
+.campo__control {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: var(--campo-alto);
+  padding: 1.35rem var(--space-5) 0.4rem var(--campo-pad);
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  outline: none;
+  font-size: var(--text-base);
+  color: var(--color-texto);
+}
+
+textarea.campo__control {
+  height: auto;
+  min-height: 104px;
+  padding-top: 1.75rem;
+  resize: vertical;
+  line-height: var(--leading-normal);
+}
+
+/* Label: flota hacia arriba y se enfoca desde un leve desenfoque, como el aire caliente. */
+.campo__label {
+  position: absolute;
+  top: calc(var(--campo-alto) / 2);
+  left: var(--campo-pad);
+  max-width: calc(100% - var(--campo-pad) - var(--space-4));
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-texto-suave);
+  font-weight: var(--peso-medio);
+  transform-origin: left center;
+  transform: translateY(-50%);
+  transition:
+    transform var(--duracion-lenta) var(--easing-salida),
+    color var(--duracion-media);
+  pointer-events: none;
+}
+
+/* Reglas separadas: si un navegador no entiende :autofill, no invalida las demás. */
+.campo--flotante .campo__label {
+  transform: translateY(calc(-50% - 0.82rem)) scale(0.78);
+  animation: enfocar-label var(--duracion-lenta) var(--easing-salida);
+}
+
+.campo:has(.campo__control:autofill) .campo__label {
+  transform: translateY(calc(-50% - 0.82rem)) scale(0.78);
+}
+
+.campo:has(.campo__control:-webkit-autofill) .campo__label {
+  transform: translateY(calc(-50% - 0.82rem)) scale(0.78);
+}
+
+.campo__opcional {
+  font-weight: var(--peso-normal);
+}
+
+.campo__icono {
+  position: absolute;
+  top: calc(var(--campo-alto) / 2);
+  left: var(--space-4);
+  translate: 0 -50%;
+  display: grid;
+  color: var(--color-texto-suave);
+  transition:
+    transform var(--duracion-lenta) var(--easing-resorte),
+    color var(--duracion-media),
+    filter var(--duracion-media);
+  pointer-events: none;
+}
+
+/* Aro de luz giratorio: solo se ve el contorno (máscara) y el degradado gira con transform. */
+.campo__aro {
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity var(--duracion-media);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+.campo__giro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(var(--brillo-1), var(--brillo-2), var(--brillo-3), var(--brillo-1));
+}
+
+/* ---------- Estados ---------- */
+@media (hover: hover) {
+  .campo:not(.campo--enfocado):not(.campo--deshabilitado):hover {
+    box-shadow: inset 0 0 0 1.5px var(--color-texto-suave);
+  }
+}
+
+.campo--enfocado {
+  box-shadow: 0 0 22px -6px var(--brillo-1);
+}
+
+.campo--enfocado .campo__aro {
+  opacity: 1;
+}
+
+.campo--enfocado .campo__giro {
+  animation: girar-aro 3s linear infinite;
+}
+
+.campo--enfocado .campo__label {
+  color: var(--color-texto);
+}
+
+.campo--enfocado .campo__icono {
+  color: var(--color-enlace);
+  transform: translateY(-3px) scale(1.1);
+  filter: drop-shadow(0 0 6px var(--brillo-2));
+}
+
+.campo--error {
+  box-shadow:
+    inset 0 0 0 2px var(--color-error),
+    0 0 18px -6px var(--color-error);
+}
+
+.campo--error .campo__icono,
+.campo--error .campo__label {
+  color: var(--color-error);
+}
+
+.campo--deshabilitado {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.campo--deshabilitado .campo__control {
+  cursor: not-allowed;
+}
+
+/* ---------- Mensajes: se aclaran desde un desenfoque con un resplandor rosa ---------- */
+.campo__mensaje {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding-inline: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-texto-suave);
+  --icono-tamano: 1.1rem;
+}
+
+.campo__mensaje ui-icon {
+  margin-top: 0.1rem;
+}
+
+.campo__mensaje--error {
+  color: var(--color-error);
+  font-weight: var(--peso-medio);
+  animation: aclarar 600ms var(--easing-salida);
+}
+
+.campo__mensaje--aviso {
+  color: var(--color-aviso);
+  font-weight: var(--peso-medio);
+  animation: aclarar 600ms var(--easing-salida);
+}
+
+@keyframes enfocar-label {
+  from {
+    filter: blur(3px);
+  }
+}
+
+@keyframes girar-aro {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes aclarar {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    text-shadow: 0 0 14px var(--brillo-1);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    text-shadow: none;
+  }
+}

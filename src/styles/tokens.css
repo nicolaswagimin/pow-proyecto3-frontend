@@ -1,0 +1,152 @@
+/*
+ * Tokens de diseño · Dirección "Hora Dorada" (atardecer en el desierto con brillo holográfico).
+ * Es el único archivo que hay que cambiar para re-tematizar el proyecto (ver docs/brief-diseno.md).
+ * Contraste verificado (WCAG AA) en ambos modos; los valores están anotados junto a cada par.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- Color · modo claro (tarde) ---------- */
+  --color-fondo: #ffe9dc;
+  --color-superficie: #fff8f3;
+  --color-campo: rgb(255 255 255 / 0.75);
+  --color-texto: #2a1033; /* 14.7:1 sobre fondo */
+  --color-texto-suave: #6b4a6e; /* 6.3:1 sobre fondo */
+  --color-borde: #9a7894; /* 3.6:1 sobre superficie */
+  --color-primario-1: #ff7a59; /* coral */
+  --color-primario-2: #ffb627; /* mango */
+  --color-primario-contraste: #2a1033; /* 6.7:1 sobre coral, 9.8:1 sobre mango */
+  --color-enlace: #b0124f; /* 5.9:1 sobre fondo */
+  --color-acento: #c2185b;
+  --color-error: #b3122e; /* 6.6:1 */
+  --color-exito: #2e7d32; /* 4.9:1 */
+  --color-aviso: #8a5a00; /* 5.6:1 */
+  --color-foco: #b0124f; /* 5.9:1 */
+  /* Cielo y desierto (decoración). */
+  --cielo-alto: #ff9a76;
+  --cielo-medio: #ffc58f;
+  --cielo-bajo: #ffe3c4;
+  --duna-1: #f2a65a;
+  --duna-2: #e07a45;
+  --duna-3: #b9503a;
+  --sol: #fff1b8;
+  --brillo-1: #ff4f8b;
+  --brillo-2: #ffc94a;
+  --brillo-3: #ff7a59;
+
+  /* ---------- Tipografía ---------- */
+  --font-display: 'Bricolage Grotesque', 'Avenir Next', system-ui, sans-serif;
+  --font-texto: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: clamp(1.75rem, 1.3rem + 1.8vw, 2.4rem);
+  --text-3xl: clamp(2.2rem, 1.5rem + 3vw, 3.4rem);
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-fuerte: 700;
+  --peso-display: 800;
+  --peso-display-medio: 600;
+  --leading-ajustado: 1.05;
+  --leading-normal: 1.55;
+
+  /* ---------- Espaciado (escala de 4 px) ---------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---------- Radios: formas suaves como dunas ---------- */
+  --radius-control: 16px;
+  --radius-panel: 32px;
+  --radius-pill: 999px;
+
+  /* ---------- Sombras cálidas ---------- */
+  --shadow-elevacion-1: 0 6px 18px -8px rgb(122 40 60 / 0.35);
+  --shadow-elevacion-2: 0 30px 70px -28px rgb(122 40 60 / 0.45);
+  --shadow-brillo: 0 0 30px rgb(255 122 89 / 0.45);
+
+  /* ---------- Movimiento ---------- */
+  --duracion-rapida: 120ms;
+  --duracion-media: 220ms;
+  --duracion-lenta: 420ms;
+  --duracion-escena: 900ms;
+  --escalonado: 75ms;
+  --easing-salida: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-entrada: cubic-bezier(0.7, 0, 0.84, 0);
+  --easing-resorte: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Resorte que se pasa un poco y vuelve: el panel del sol al cruzar. */
+  --easing-rebote: cubic-bezier(0.68, -0.35, 0.27, 1.35);
+  --easing-suave: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* ---------- Color · modo oscuro (crepúsculo) ---------- */
+/* Se repite en dos bloques: uno sigue al sistema y otro lo fija el botón de tema. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --color-fondo: #1b0b24;
+    --color-superficie: #2a1436;
+    --color-campo: rgb(52 26 66 / 0.85);
+    --color-texto: #fff1e8; /* 17:1 */
+    --color-texto-suave: #d9b8c9; /* 9.3:1 */
+    --color-borde: #9e7a98; /* 4.2:1 sobre campo */
+    --color-primario-1: #ff7a6b;
+    --color-primario-2: #ffc94a;
+    --color-primario-contraste: #1b0b24; /* 7.4:1 sobre coral */
+    --color-enlace: #ffc94a; /* 11:1 */
+    --color-acento: #ff4f8b;
+    --color-error: #ff8fa0; /* 7.7:1 */
+    --color-exito: #7be0a0;
+    --color-aviso: #ffc94a;
+    --color-foco: #ffc94a; /* 12.2:1 */
+    --cielo-alto: #2b0f3a;
+    --cielo-medio: #6a1f4f;
+    --cielo-bajo: #c8475a;
+    --duna-1: #5a2147;
+    --duna-2: #3d1538;
+    --duna-3: #240c2c;
+    --sol: #ffd27a;
+    --shadow-elevacion-1: 0 6px 18px -8px rgb(0 0 0 / 0.6);
+    --shadow-elevacion-2: 0 30px 70px -28px rgb(0 0 0 / 0.75);
+    --shadow-brillo: 0 0 30px rgb(255 122 107 / 0.45);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-fondo: #1b0b24;
+  --color-superficie: #2a1436;
+  --color-campo: rgb(52 26 66 / 0.85);
+  --color-texto: #fff1e8;
+  --color-texto-suave: #d9b8c9;
+  --color-borde: #9e7a98;
+  --color-primario-1: #ff7a6b;
+  --color-primario-2: #ffc94a;
+  --color-primario-contraste: #1b0b24;
+  --color-enlace: #ffc94a;
+  --color-acento: #ff4f8b;
+  --color-error: #ff8fa0;
+  --color-exito: #7be0a0;
+  --color-aviso: #ffc94a;
+  --color-foco: #ffc94a;
+  --cielo-alto: #2b0f3a;
+  --cielo-medio: #6a1f4f;
+  --cielo-bajo: #c8475a;
+  --duna-1: #5a2147;
+  --duna-2: #3d1538;
+  --duna-3: #240c2c;
+  --sol: #ffd27a;
+  --shadow-elevacion-1: 0 6px 18px -8px rgb(0 0 0 / 0.6);
+  --shadow-elevacion-2: 0 30px 70px -28px rgb(0 0 0 / 0.75);
+  --shadow-brillo: 0 0 30px rgb(255 122 107 / 0.45);
+}

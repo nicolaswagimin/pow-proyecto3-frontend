@@ -1,0 +1,232 @@
+:host {
+  display: block;
+  background: var(--color-fondo);
+}
+
+/* ---------- Pantalla dividida (escritorio) ---------- */
+.escena {
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.panel,
+.lado {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  transition: transform var(--duracion-escena) var(--easing-rebote);
+}
+
+.panel {
+  left: 0;
+  overflow: hidden;
+  border-radius: 0 var(--radius-panel) var(--radius-panel) 0;
+  box-shadow: var(--shadow-elevacion-2);
+  z-index: 1;
+}
+
+.lado {
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Registro: el panel del sol cruza a la derecha y el formulario a la izquierda. */
+.escena--registro .panel {
+  transform: translateX(100%);
+  border-radius: var(--radius-panel) 0 0 var(--radius-panel);
+}
+
+.escena--registro .lado {
+  transform: translateX(-100%);
+}
+
+/* El botón de tema queda siempre en el borde exterior de la pantalla. */
+.escena--registro .cabecera {
+  justify-content: flex-start;
+}
+
+.panel__marca {
+  position: absolute;
+  top: var(--space-6);
+  left: var(--space-8);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-texto);
+  font-family: var(--font-display);
+  font-weight: var(--peso-display);
+  font-size: var(--text-xl);
+  animation: bajar 900ms var(--easing-salida) 600ms both;
+}
+
+.panel__sol {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fff, var(--sol) 50%, var(--brillo-2));
+  box-shadow: 0 0 14px var(--brillo-2);
+}
+
+/* ---------- Lado del formulario ---------- */
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  padding: var(--space-4) clamp(var(--space-4), 4vw, var(--space-10));
+  animation: bajar 800ms var(--easing-salida) 300ms both;
+}
+
+.lado__centro {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4) clamp(var(--space-4), 5vw, var(--space-12)) var(--space-12);
+}
+
+/* ---------- Tarjeta con brillo holográfico ---------- */
+.tarjeta {
+  position: relative;
+  width: min(100%, 440px);
+  overflow: hidden;
+  border-radius: var(--radius-panel);
+  background: var(--color-superficie);
+  box-shadow:
+    var(--shadow-elevacion-2),
+    inset 0 0 0 1px color-mix(in srgb, var(--color-texto) 10%, transparent);
+  transition: transform 200ms var(--easing-salida);
+  animation: tarjeta-sube 1s var(--easing-salida) 700ms both;
+}
+
+.holo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Reflejo iridiscente: un degradado cónico grande que se mueve con transform. */
+.holo__luz {
+  position: absolute;
+  top: -260px;
+  left: -260px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.55), transparent 35%),
+    conic-gradient(from 0deg, var(--brillo-1), var(--brillo-2), #7de2d1, #9f8cff, var(--brillo-1));
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  -webkit-mask: radial-gradient(circle, #000 20%, transparent 70%);
+  mask: radial-gradient(circle, #000 20%, transparent 70%);
+  transform: translate3d(330px, 120px, 0);
+  transition: transform 450ms var(--easing-salida);
+  will-change: transform;
+}
+
+/* En táctil el reflejo deriva solo. */
+:host(.tactil) .holo__luz {
+  transition: none;
+  animation: deriva-holo 10s var(--easing-suave) infinite alternate;
+}
+
+.contenido {
+  --retraso-base: 1100ms;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: clamp(var(--space-6), 4vw, var(--space-10));
+}
+
+/* ---------- Móvil: el sol es una banda superior ---------- */
+@media (max-width: 860px) {
+  .escena {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .panel,
+  .lado {
+    position: relative;
+    width: 100%;
+    transform: none !important;
+  }
+
+  .panel {
+    height: 190px;
+    flex-shrink: 0;
+    border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+    transform-origin: top;
+  }
+
+  .escena--registro .panel {
+    border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+  }
+
+  /* El formulario va por encima de la banda: la tarjeta la monta un poco y el tema flota sobre ella. */
+  .lado {
+    left: 0;
+    z-index: 2;
+    overflow: visible;
+  }
+
+  .escena--registro .cabecera {
+    justify-content: flex-end;
+  }
+
+  .panel__marca {
+    left: var(--space-5);
+    top: var(--space-4);
+    font-size: var(--text-lg);
+  }
+
+  /* La cabecera flota sobre la banda del sol, a la derecha. */
+  .cabecera {
+    position: absolute;
+    top: calc(-190px + var(--space-2));
+    right: 0;
+    left: auto;
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .lado__centro {
+    padding: 0 var(--space-4) var(--space-10);
+    margin-top: -36px;
+  }
+}
+
+@keyframes bajar {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+
+/* Usa translate (no transform) para no pisar la inclinación que aplica el JS. */
+@keyframes tarjeta-sube {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+    filter: blur(8px);
+  }
+}
+
+@keyframes deriva-holo {
+  from {
+    transform: translate3d(40px, 40px, 0);
+  }
+  to {
+    transform: translate3d(380px, 420px, 0);
+  }
+}

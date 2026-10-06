@@ -1,0 +1,207 @@
+:host {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--cielo-alto), var(--cielo-medio) 55%, var(--cielo-bajo));
+  pointer-events: none;
+}
+
+/* Ambiente: fondo fijo y tenue para las pantallas de trabajo. */
+:host(.ambiente) {
+  position: fixed;
+  z-index: 0;
+  background: var(--color-fondo);
+}
+
+:host(.ambiente) .blob {
+  opacity: 0.32;
+}
+
+:host(.pausado) *,
+:host(.pausado) *::before {
+  animation-play-state: paused !important;
+}
+
+/* ---------- Malla de degradados: manchas difuminadas que derivan (solo transform) ---------- */
+.blob {
+  position: absolute;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.6;
+  will-change: transform;
+}
+
+.blob--1 {
+  top: -20%;
+  left: -15%;
+  background: radial-gradient(circle, var(--brillo-1), transparent 65%);
+  animation: derivar-1 16s var(--easing-suave) infinite alternate;
+}
+
+.blob--2 {
+  top: 10%;
+  right: -25%;
+  background: radial-gradient(circle, var(--brillo-2), transparent 65%);
+  animation: derivar-2 19s var(--easing-suave) infinite alternate;
+}
+
+.blob--3 {
+  bottom: -25%;
+  left: 15%;
+  background: radial-gradient(circle, var(--brillo-3), transparent 65%);
+  animation: derivar-3 22s var(--easing-suave) infinite alternate;
+}
+
+.blob--4 {
+  top: 35%;
+  left: 30%;
+  width: 45%;
+  background: radial-gradient(circle, var(--color-acento), transparent 65%);
+  opacity: 0.35;
+  animation: derivar-2 25s var(--easing-suave) infinite alternate-reverse;
+}
+
+/* ---------- Amanecer: el cielo pasa de ciruela al color del tema al cargar ---------- */
+.noche {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #2b0f3a, #6a1f4f 60%, #c8475a);
+  animation: amanecer 2.2s var(--easing-suave) 200ms both;
+}
+
+/* ---------- Sol: sale desde detrás de las dunas y respira ---------- */
+.sol {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  width: min(46%, 300px);
+  aspect-ratio: 1;
+  translate: -50% 0;
+  animation: sol-sale 2s var(--easing-salida) 300ms both;
+}
+
+.sol__disco {
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 40%, #fff, var(--sol) 45%, var(--brillo-2));
+  box-shadow:
+    0 0 60px 10px color-mix(in srgb, var(--sol) 70%, transparent),
+    0 0 140px 40px color-mix(in srgb, var(--brillo-3) 45%, transparent);
+  animation: respirar 5s var(--easing-suave) infinite alternate;
+}
+
+.sol__rayos {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    color-mix(in srgb, var(--sol) 75%, transparent) 0 4deg,
+    transparent 4deg 18deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 30%, #000 34%, transparent 70%);
+  mask: radial-gradient(circle, transparent 30%, #000 34%, transparent 70%);
+  animation: girar 40s linear infinite;
+}
+
+/* ---------- Dunas: tres capas que ondulan a distinto ritmo ---------- */
+.duna {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  max-width: none;
+  height: 34%;
+  animation: ondular 60s linear infinite;
+}
+
+.duna--3 path {
+  fill: var(--duna-1);
+}
+
+.duna--2 {
+  height: 28%;
+  animation-duration: 45s;
+}
+
+.duna--2 path {
+  fill: var(--duna-2);
+}
+
+.duna--1 {
+  height: 22%;
+  animation-duration: 32s;
+}
+
+.duna--1 path {
+  fill: var(--duna-3);
+}
+
+/* En pantallas chicas, una capa menos de dunas y una mancha menos. */
+@media (max-width: 860px) {
+  .duna--3,
+  .blob--4 {
+    display: none;
+  }
+
+  .sol {
+    top: 12%;
+    width: min(38%, 150px);
+  }
+
+  .duna {
+    height: 40%;
+  }
+}
+
+@keyframes derivar-1 {
+  to {
+    transform: translate(25%, 20%) scale(1.15);
+  }
+}
+
+@keyframes derivar-2 {
+  to {
+    transform: translate(-30%, 15%) scale(0.9);
+  }
+}
+
+@keyframes derivar-3 {
+  to {
+    transform: translate(20%, -25%) scale(1.2);
+  }
+}
+
+@keyframes amanecer {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes sol-sale {
+  from {
+    transform: translateY(80%) scale(0.85);
+    opacity: 0.4;
+  }
+}
+
+@keyframes respirar {
+  to {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes girar {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes ondular {
+  to {
+    transform: translateX(-50%);
+  }
+}

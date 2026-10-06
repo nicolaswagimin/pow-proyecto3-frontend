@@ -1,0 +1,28 @@
+<div class="escena" [class.escena--registro]="modo() === 'registro'">
+  <section class="panel" #panel aria-hidden="true">
+    <fx-cielo />
+    <p class="panel__marca">
+      <span class="panel__sol"></span>
+      {{ nombreApp }}
+    </p>
+  </section>
+
+  <section class="lado">
+    <header class="cabecera">
+      <ui-theme-toggle />
+    </header>
+
+    <div class="lado__centro">
+      <div class="tarjeta" #tarjeta (pointermove)="brillar($event)" (pointerleave)="apagarBrillo()">
+        <span class="holo" aria-hidden="true"><span class="holo__luz" #holo></span></span>
+        <div class="contenido" #contenido [class.cascada-inicial]="cascada()">
+          <ng-content select="[auth-encabezado]" />
+          <ng-content />
+          <ng-content select="[auth-pie]" />
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<fx-estallido />
