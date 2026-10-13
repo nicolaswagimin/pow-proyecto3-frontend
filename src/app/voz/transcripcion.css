@@ -95,6 +95,18 @@
   color: var(--color-interino);
 }
 
+/* Pantallas angostas: el guion va arriba del formulario, así que solo se ven las dos últimas
+   frases, para que el formulario quede a la vista. */
+@media (max-width: 959px) {
+  .linea {
+    font-size: var(--text-lg);
+  }
+
+  .linea:not(:nth-last-child(-n + 2)) {
+    display: none;
+  }
+}
+
 @keyframes latir {
   50% {
     opacity: 0.35;
