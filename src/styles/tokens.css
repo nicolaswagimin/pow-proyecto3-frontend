@@ -28,8 +28,11 @@
   --color-foco: #2f3fd0;
 
   /* ---------- Tipografía ---------- */
-  --font-display: 'Bricolage Grotesque', 'Avenir Next', system-ui, sans-serif;
-  --font-texto: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Schibsted Grotesk: la interfaz que se construye. Newsreader: la voz, lo que se dijo (la
+     transcripción se lee como un guion). Dos familias claramente distintas, cada una con su rol. */
+  --font-display: 'Schibsted Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-texto: 'Schibsted Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-voz: 'Newsreader', Georgia, 'Times New Roman', serif;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -38,11 +41,11 @@
   --text-2xl: clamp(1.75rem, 1.3rem + 1.8vw, 2.4rem);
   --text-3xl: clamp(2.2rem, 1.5rem + 3vw, 3.4rem);
   --peso-normal: 400;
-  --peso-medio: 500;
+  --peso-medio: 400;
   --peso-fuerte: 700;
-  --peso-display: 800;
-  --peso-display-medio: 600;
-  --leading-ajustado: 1.05;
+  --peso-display: 700;
+  --peso-display-medio: 700;
+  --leading-ajustado: 1.1;
   --leading-normal: 1.55;
 
   /* ---------- Espaciado (escala de 4 px) ---------- */
