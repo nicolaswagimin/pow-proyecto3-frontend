@@ -12,7 +12,8 @@ export type NombreIcono =
   | 'papelera'
   | 'recargar'
   | 'mas'
-  | 'mayus';
+  | 'mayus'
+  | 'microfono';
 
 // Íconos propios en línea, trazo de 1.8 px y extremos redondeados. Siempre decorativos:
 // el texto accesible lo pone el elemento que los contiene.
@@ -68,6 +69,10 @@ export type NombreIcono =
         }
         @case ('mas') {
           <svg:path d="M12 5v14M5 12h14" />
+        }
+        @case ('microfono') {
+          <svg:rect x="9" y="3" width="6" height="11" rx="3" />
+          <svg:path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" />
         }
         @case ('mayus') {
           <svg:path d="M12 4 4.5 12H8.5v4.5h7V12h4L12 4Z" />
