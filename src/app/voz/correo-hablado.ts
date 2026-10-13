@@ -11,9 +11,5 @@ const REEMPLAZOS: [RegExp, string][] = [
 export function correoHablado(texto: string): string {
   let correo = texto.trim().toLowerCase();
   for (const [patron, signo] of REEMPLAZOS) correo = correo.replace(patron, signo);
-  return correo
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/\s+/g, '')
-    .replace(/\.$/, '');
+  return correo.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '').replace(/\.$/, '');
 }
