@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { TemaService } from '../../core/tema.service';
 
-// El sol se pone tras una duna y sale la luna con estrellas que titilan (o al revés).
+// Un fader de la consola del estudio: arriba, luz encendida (modo claro); abajo, cabina a oscuras.
 @Component({
   selector: 'ui-theme-toggle',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -11,21 +11,12 @@ import { TemaService } from '../../core/tema.service';
       class="tema"
       [class.tema--oscuro]="oscuro()"
       [attr.aria-label]="oscuro() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-      (click)="alternar($event)"
+      (click)="alternar()"
     >
-      <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-        <g class="estrellas">
-          <circle cx="7" cy="8" r="1" />
-          <circle cx="25" cy="6" r="1.2" />
-          <circle cx="21" cy="12" r="0.8" />
-        </g>
-        <g class="sol">
-          <circle cx="16" cy="15" r="5.5" />
-        </g>
-        <g class="luna">
-          <path d="M18.5 8.5a6.5 6.5 0 1 0 4 11.6A7.2 7.2 0 0 1 18.5 8.5Z" />
-        </g>
-        <path class="duna" d="M0 32V22c5-4 9-4.5 14-2.2s9 2.6 18-1.3V32Z" />
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path class="pista" d="M12 3v18" />
+        <path class="marcas" d="M7 5h2M7 9h2M7 13h2M7 17h2M15 5h2M15 9h2M15 13h2M15 17h2" />
+        <rect class="perilla" x="8" y="4" width="8" height="5" rx="1.5" />
       </svg>
     </button>
   `,
@@ -35,8 +26,7 @@ export class ThemeToggle {
   private readonly temaService = inject(TemaService);
   protected readonly oscuro = computed(() => this.temaService.tema() === 'oscuro');
 
-  protected alternar(evento: MouseEvent): void {
-    const caja = (evento.currentTarget as HTMLElement).getBoundingClientRect();
-    this.temaService.alternar({ x: caja.left + caja.width / 2, y: caja.top + caja.height / 2 });
+  protected alternar(): void {
+    this.temaService.alternar();
   }
 }

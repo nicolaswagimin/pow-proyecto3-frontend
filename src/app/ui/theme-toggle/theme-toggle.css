@@ -5,105 +5,45 @@
 .tema {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  overflow: hidden;
+  width: 44px;
+  height: 44px;
   border: 0;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(180deg, var(--cielo-alto), var(--cielo-bajo));
-  box-shadow:
-    inset 0 0 0 1.5px color-mix(in srgb, var(--color-texto) 25%, transparent),
-    var(--shadow-elevacion-1);
-  transition: transform var(--duracion-media) var(--easing-resorte);
+  border-radius: var(--radius-control);
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--color-borde);
+  color: var(--color-texto);
 }
 
 @media (hover: hover) {
   .tema:hover {
-    transform: scale(1.08) rotate(-4deg);
+    background: color-mix(in srgb, var(--color-texto) 8%, transparent);
   }
-}
-
-.tema:active {
-  transform: scale(0.94);
 }
 
 svg {
-  width: 48px;
-  height: 48px;
-  overflow: visible;
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
 }
 
-.sol,
-.luna,
-.estrellas circle {
-  transform-box: fill-box;
-  transform-origin: center;
+.pista {
+  stroke-width: 2;
 }
 
-.sol circle {
-  fill: var(--sol);
-  filter: drop-shadow(0 0 3px var(--brillo-2));
+.marcas {
+  stroke-width: 1.2;
+  opacity: 0.6;
 }
 
-.luna path {
-  fill: #fff1e8;
+/* La perilla baja al pasar a oscuro: es el gesto de bajar la luz. */
+.perilla {
+  fill: currentColor;
+  stroke: none;
+  transition: transform var(--duracion-lenta) var(--easing-salida);
 }
 
-.duna {
-  fill: var(--duna-3);
-}
-
-.sol,
-.luna {
-  transition:
-    transform var(--duracion-escena) var(--easing-resorte),
-    opacity var(--duracion-lenta);
-}
-
-/* Claro: el sol está alto; la luna, escondida tras la duna. */
-.luna {
-  transform: translateY(18px);
-  opacity: 0;
-}
-
-.estrellas circle {
-  fill: #fff1e8;
-  opacity: 0;
-  transform: scale(0);
-  transition:
-    opacity var(--duracion-lenta),
-    transform var(--duracion-lenta) var(--easing-resorte);
-}
-
-.tema--oscuro .sol {
-  transform: translateY(18px);
-  opacity: 0;
-}
-
-.tema--oscuro .luna {
-  transform: none;
-  opacity: 1;
-}
-
-.tema--oscuro .estrellas circle {
-  opacity: 1;
-  transform: none;
-  animation: titilar 2.4s var(--easing-suave) infinite alternate;
-}
-
-.tema--oscuro .estrellas circle:nth-child(2) {
-  transition-delay: 150ms;
-  animation-delay: -0.8s;
-}
-
-.tema--oscuro .estrellas circle:nth-child(3) {
-  transition-delay: 300ms;
-  animation-delay: -1.6s;
-}
-
-@keyframes titilar {
-  to {
-    opacity: 0.3;
-  }
+.tema--oscuro .perilla {
+  transform: translateY(11px);
 }
