@@ -26,11 +26,7 @@ export class Dictado {
   ) {}
 
   reproducir(frases: Frase[]): void {
-    for (const frase of frases) {
-      const id = ++siguienteId;
-      this.cola.push({ frase, id });
-      this.lineas.update((l) => [...l, { id, quien: 'tu', texto: '', interino: '' }]);
-    }
+    for (const frase of frases) this.cola.push({ frase, id: ++siguienteId });
     if (prefiereMenosMovimiento() || document.hidden) {
       this.saltar();
       return;
@@ -43,6 +39,13 @@ export class Dictado {
     for (const { frase, id } of this.cola) this.confirmar(frase, id);
     this.cola = [];
     this.enCurso.set(false);
+  }
+
+  // Vuelve a empezar: borra el guion y desarma los bloques.
+  reiniciar(): void {
+    this.saltar();
+    this.lineas.set([]);
+    this.ensamblados.set(new Set());
   }
 
   ensamblado(bloque: string): boolean {
@@ -77,6 +80,8 @@ export class Dictado {
       return;
     }
     this.enCurso.set(true);
+    // La línea aparece cuando empieza a dictarse, no antes.
+    this.lineas.update((l) => [...l, { id: actual.id, quien: 'tu', texto: '', interino: '' }]);
     const palabras = actual.frase.texto.split(' ');
     let dichas = 0;
     const paso = () => {
@@ -94,7 +99,11 @@ export class Dictado {
   }
 
   private confirmar(frase: Frase, id: number): void {
-    this.actualizar(id, { texto: frase.texto, interino: '' });
+    if (this.lineas().some((linea) => linea.id === id)) {
+      this.actualizar(id, { texto: frase.texto, interino: '' });
+    } else {
+      this.lineas.update((l) => [...l, { id, quien: 'tu', texto: frase.texto }]);
+    }
     if (frase.bloque) {
       const bloque = frase.bloque;
       this.ensamblados.update((s) => new Set(s).add(bloque));
