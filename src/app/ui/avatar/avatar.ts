@@ -1,18 +1,25 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-// Avatar con las iniciales sobre un degradado de atardecer. Con [amanecer], un sol con rayos
-// sale por detrás del círculo al cargar la pantalla.
+// Iniciales del usuario en un círculo ultramar. Decorativo: el nombre se muestra al lado.
 @Component({
   selector: 'ui-avatar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <span class="halo" aria-hidden="true"><span class="halo__rayos"></span></span>
-    <span class="disco" aria-hidden="true">{{ iniciales() }}</span>
+  template: `<span aria-hidden="true">{{ iniciales() }}</span>`,
+  styles: `
+    :host {
+      display: inline-grid;
+      place-items: center;
+      width: var(--avatar-tamano, 44px);
+      height: var(--avatar-tamano, 44px);
+      border-radius: 50%;
+      background: var(--color-primario);
+      color: var(--color-primario-contraste);
+      font-weight: var(--peso-fuerte);
+      font-size: calc(var(--avatar-tamano, 44px) * 0.38);
+      flex-shrink: 0;
+    }
   `,
-  styleUrl: './avatar.css',
-  host: { '[class.amanecer]': 'amanecer()' },
 })
 export class Avatar {
   readonly iniciales = input.required<string>();
-  readonly amanecer = input(false, { transform: booleanAttribute });
 }
