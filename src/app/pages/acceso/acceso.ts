@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  DestroyRef,
   computed,
   effect,
   inject,
@@ -26,6 +27,8 @@ import { AuthService } from '../../core/auth.service';
 import { CampoAuth, ErrorInterfaz, mapearError } from '../../core/errores';
 import { AuthLayout } from '../../layouts/auth-layout/auth-layout';
 import { Alert } from '../../ui/alert/alert';
+import { Dictado, Frase } from '../../voz/dictado';
+import { Transcripcion } from '../../voz/transcripcion';
 import { Button } from '../../ui/button/button';
 import { PasswordField } from '../../ui/password-field/password-field';
 import { TextField } from '../../ui/text-field/text-field';
@@ -36,18 +39,18 @@ const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const TEXTOS = {
   login: {
-    titulo: 'Hola otra vez',
-    subtitulo: 'Entra para seguir donde lo dejaste.',
+    titulo: 'Inicia sesión',
+    subtitulo: 'Esta página se arma con lo que se dicta en el guion.',
     boton: 'Iniciar sesión',
     cargando: 'Iniciando sesión…',
-    pregunta: '¿Sin cuenta?',
+    pregunta: '¿No tienes cuenta?',
     enlace: '/registro',
-    enlaceTexto: 'Crear una',
+    enlaceTexto: 'Crea una',
     exito: 'Sesión iniciada. Entrando…',
   },
   registro: {
     titulo: 'Crea tu cuenta',
-    subtitulo: 'Tu lugar está listo.',
+    subtitulo: 'El campo del nombre se agregó por dictado.',
     boton: 'Crear cuenta',
     cargando: 'Creando tu cuenta…',
     pregunta: '¿Ya tienes cuenta?',
@@ -56,6 +59,31 @@ const TEXTOS = {
     exito: 'Cuenta creada. Entrando…',
   },
 } as const;
+
+// El guion que se dicta al abrir el acceso: cada frase ensambla un bloque de la página.
+const GUIONES: Record<Modo, Frase[]> = {
+  login: [
+    { texto: 'Quiero una página para entrar a mi cuenta,', bloque: 'titulo' },
+    { texto: 'con un campo para mi correo', bloque: 'correo' },
+    { texto: 'y otro para la contraseña.', bloque: 'contrasena' },
+    { texto: 'Abajo, un botón para entrar', bloque: 'boton' },
+    { texto: 'y un enlace para crear una cuenta.', bloque: 'enlace' },
+  ],
+  registro: [
+    { texto: 'Quiero una página para crear mi cuenta,', bloque: 'titulo' },
+    { texto: 'con mi nombre,', bloque: 'nombre' },
+    { texto: 'mi correo', bloque: 'correo' },
+    { texto: 'y una contraseña.', bloque: 'contrasena' },
+    { texto: 'Abajo, un botón para crearla', bloque: 'boton' },
+    { texto: 'y un enlace por si ya tengo cuenta.', bloque: 'enlace' },
+  ],
+};
+
+// Lo que se dicta al cambiar de modo: la página se edita por voz.
+const CAMBIOS: Record<Modo, Frase> = {
+  registro: { texto: 'Agrega un campo para el nombre.', bloque: 'nombre' },
+  login: { texto: 'Quita el nombre: ya tengo cuenta.' },
+};
 
 const NOMBRES_CAMPO: Record<CampoAuth, string> = {
   nombre: 'Nombre',
@@ -71,7 +99,16 @@ function noVacio(control: AbstractControl<string>): ValidationErrors | null {
 @Component({
   selector: 'app-acceso',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink, AuthLayout, Alert, Button, TextField, PasswordField],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    AuthLayout,
+    Alert,
+    Button,
+    TextField,
+    PasswordField,
+    Transcripcion,
+  ],
   templateUrl: './acceso.html',
   styleUrl: './acceso.css',
 })
@@ -110,8 +147,10 @@ export class Acceso {
   private readonly campoPassword = viewChild.required(PasswordField);
 
   private primeraVez = true;
+  protected readonly dictado = new Dictado();
 
   constructor() {
+    inject(DestroyRef).onDestroy(() => this.dictado.detener());
     effect(() => {
       const modo: Modo = this.modo() === 'registro' ? 'registro' : 'login';
       untracked(() => this.cambiarModo(modo));
@@ -138,6 +177,11 @@ export class Acceso {
         if (errores['maxlength']) return 'La contraseña no puede superar los 72 caracteres.';
         return 'La contraseña necesita al menos 8 caracteres.';
     }
+  }
+
+  protected repetir(): void {
+    this.dictado.reiniciar();
+    this.dictado.reproducir(GUIONES[this.modoVisible()]);
   }
 
   protected enviar(): void {
@@ -173,6 +217,7 @@ export class Acceso {
         clearTimeout(avisoLento);
         this.servidorLento.set(false);
         this.anunciar(TEXTOS[modo].exito);
+        this.dictado.agregar('app', TEXTOS[modo].exito);
         await this.router.navigateByUrl('/app');
       },
       error: (err: unknown) => {
@@ -180,6 +225,8 @@ export class Acceso {
         this.servidorLento.set(false);
         this.enviando.set(false);
         const error = mapearError(err, modo);
+        // La respuesta también queda en el guion, como la contestación de la app.
+        this.dictado.agregar('app', error.mensaje);
         if (error.campo && !error.accion) {
           this.form.controls[error.campo].setErrors({ servidor: error.mensaje });
           this.enfocarCampo(error.campo);
@@ -187,7 +234,7 @@ export class Acceso {
         } else {
           this.errorGeneral.set(error);
         }
-        },
+      },
     });
   }
 
@@ -195,9 +242,11 @@ export class Acceso {
     if (this.primeraVez) {
       this.primeraVez = false;
       this.aplicarModo(modo);
+      this.dictado.reproducir(GUIONES[modo]);
       return;
     }
     if (modo === this.modoVisible()) return;
+    this.dictado.reproducir([CAMBIOS[modo]]);
     this.aplicarModo(modo);
     // El foco va al título, salvo que la persona ya haya empezado a escribir en un campo.
     const activo = document.activeElement;
