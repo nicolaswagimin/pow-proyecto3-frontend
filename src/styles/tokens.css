@@ -75,7 +75,6 @@
   --easing-salida: cubic-bezier(0.16, 1, 0.3, 1);
   --easing-entrada: cubic-bezier(0.7, 0, 0.84, 0);
   --easing-resorte: cubic-bezier(0.34, 1.56, 0.64, 1);
-  /* Resorte que se pasa un poco y vuelve: el panel del sol al cruzar. */
   --easing-suave: cubic-bezier(0.45, 0, 0.55, 1);
 }
 
