@@ -1,57 +1,38 @@
 :host {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  display: block;
   margin-top: var(--space-3);
-  animation: amanecer-medidor var(--duracion-lenta) var(--easing-salida);
+  --medidor-color: var(--color-primario);
 }
 
-.horizonte {
-  flex-shrink: 0;
-  width: 88px;
-  height: 50px;
-  overflow: visible;
+:host([data-nivel='1']) {
+  --medidor-color: var(--color-error);
 }
 
-.cielo--noche {
-  fill: var(--cielo-alto);
-  opacity: 0.85;
+/* Cuatro bloques, como piezas de maqueta que se completan. */
+.regla {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  height: 8px;
 }
 
-/* El cielo dorado aparece por encima del ciruela según el nivel. */
-.cielo--dia {
-  fill: var(--color-primario-2);
-  transition: opacity var(--duracion-escena) var(--easing-suave);
+.tramo {
+  border: 1px solid var(--color-borde);
+  border-radius: 3px;
+  background: transparent;
+  transition:
+    background-color var(--duracion-media) var(--easing-salida),
+    border-color var(--duracion-media);
 }
 
-.arco {
-  fill: none;
-  stroke: var(--color-borde);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 3;
-}
-
-.suelo {
-  stroke: var(--color-texto);
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-/* El sol gira alrededor del centro del arco: así recorre el horizonte. */
-.sol {
-  transform-origin: 50px 50px;
-  transition: rotate var(--duracion-escena) var(--easing-resorte);
-}
-
-.sol circle {
-  fill: var(--color-primario-1);
-  stroke: var(--color-superficie);
-  stroke-width: 2;
-  filter: drop-shadow(0 0 4px var(--brillo-2));
+.tramo--lleno {
+  border-color: var(--medidor-color);
+  background: var(--medidor-color);
 }
 
 .texto {
   min-height: 1.4em;
+  margin-top: var(--space-2);
   font-size: var(--text-sm);
   color: var(--color-texto-suave);
 }
@@ -60,10 +41,6 @@
   color: var(--color-texto);
 }
 
-@keyframes amanecer-medidor {
-  from {
-    opacity: 0;
-    filter: blur(4px);
-    transform: translateY(8px);
-  }
+:host([data-nivel='1']) .texto strong {
+  color: var(--color-error);
 }
