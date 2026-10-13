@@ -1,17 +1,15 @@
+/* Mensaje del sistema: borde lateral del tipo, ícono y texto (nunca solo color). */
 :host {
-  --alerta-color: var(--color-enlace);
+  --alerta-color: var(--color-primario);
   display: flex;
   gap: var(--space-3);
   align-items: flex-start;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--alerta-color) 12%, var(--color-superficie));
-  box-shadow:
-    inset 0 0 0 1.5px color-mix(in srgb, var(--alerta-color) 50%, transparent),
-    0 0 24px -8px var(--alerta-color);
+  border-left: 4px solid var(--alerta-color);
+  background: color-mix(in srgb, var(--alerta-color) 8%, var(--color-superficie));
   color: var(--color-texto);
   font-size: var(--text-sm);
-  animation: aclarar-alerta 650ms var(--easing-salida);
 }
 
 :host([data-tipo='error']) {
@@ -29,7 +27,7 @@
 .icono {
   display: grid;
   color: var(--alerta-color);
-  --icono-tamano: 1.35rem;
+  --icono-tamano: 1.25rem;
 }
 
 .cuerpo {
@@ -39,18 +37,4 @@
 
 .titulo {
   font-weight: var(--peso-fuerte);
-}
-
-/* Entra desde un desenfoque, como un espejismo que se aclara, con un resplandor rosa. */
-@keyframes aclarar-alerta {
-  0% {
-    opacity: 0;
-    filter: blur(10px);
-    transform: scale(1.03);
-    box-shadow: 0 0 40px 4px var(--brillo-1);
-  }
-  60% {
-    opacity: 1;
-    filter: blur(0);
-  }
 }
