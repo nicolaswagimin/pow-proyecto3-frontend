@@ -84,22 +84,6 @@
   /* Resorte que se pasa un poco y vuelve: el panel del sol al cruzar. */
   --easing-rebote: cubic-bezier(0.68, -0.35, 0.27, 1.35);
   --easing-suave: cubic-bezier(0.45, 0, 0.55, 1);
-
-  /* ---------- Alias del diseño anterior (se retiran al migrar los componentes) ---------- */
-  --color-primario-1: var(--color-primario);
-  --color-primario-2: var(--color-primario);
-  --color-acento: var(--color-primario);
-  --color-campo: var(--color-superficie);
-  --brillo-1: var(--color-maqueta);
-  --brillo-2: var(--color-maqueta);
-  --brillo-3: var(--color-maqueta);
-  --cielo-alto: var(--color-fondo);
-  --cielo-medio: var(--color-fondo);
-  --cielo-bajo: var(--color-fondo);
-  --duna-1: var(--color-maqueta);
-  --duna-2: var(--color-maqueta);
-  --duna-3: var(--color-maqueta);
-  --sol: var(--color-maqueta);
 }
 
 /* ---------- Color · modo oscuro (cabina de grabación) ---------- */
