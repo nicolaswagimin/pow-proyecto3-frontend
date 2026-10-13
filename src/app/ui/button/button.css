@@ -7,27 +7,24 @@
 }
 
 .boton {
+  --boton-fondo: transparent;
   --boton-texto: var(--color-texto);
   --boton-borde: transparent;
-  position: relative;
-  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 52px;
-  min-width: 52px;
-  padding: 0 var(--space-6);
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 var(--space-5);
   border: 0;
-  border-radius: var(--radius-pill);
-  background: none;
+  border-radius: var(--radius-control);
+  background: var(--boton-fondo);
+  box-shadow: inset 0 0 0 1.5px var(--boton-borde);
   color: var(--boton-texto);
   font-weight: var(--peso-fuerte);
-  letter-spacing: 0.01em;
   -webkit-tap-highlight-color: transparent;
-  transition:
-    transform var(--duracion-media) var(--easing-resorte),
-    box-shadow var(--duracion-media);
+  transition: background-color var(--duracion-media);
 }
 
 :host(.ancho-completo) .boton {
@@ -36,72 +33,24 @@
 
 .boton--compacto {
   min-height: 44px;
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-3);
   font-size: var(--text-sm);
-}
-
-.fondo {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1.5px var(--boton-borde);
 }
 
 .contenido {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  transition:
-    opacity var(--duracion-media),
-    transform var(--duracion-lenta) var(--easing-resorte);
 }
 
-/* ---------- Primario: degradado coral→mango que fluye sin fin ---------- */
+/* ---------- Variantes ---------- */
 .boton--primario {
+  --boton-fondo: var(--color-primario);
   --boton-texto: var(--color-primario-contraste);
-  box-shadow: var(--shadow-brillo);
-}
-
-/* El degradado mide el triple del botón y se desplaza con transform (sin repintar). */
-.flujo {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 300%;
-  display: none;
-  background: linear-gradient(
-    90deg,
-    var(--color-primario-1),
-    var(--color-primario-2),
-    var(--color-primario-1),
-    var(--color-primario-2)
-  );
-  animation: fluir 6s linear infinite;
-}
-
-.boton--primario .flujo {
-  display: block;
-}
-
-/* Destello: una franja de luz que cruza el botón al pasar el mouse. */
-.destello {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -40%;
-  width: 35%;
-  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.65), transparent);
-  transform: translateX(0) skewX(-18deg);
-  opacity: 0;
 }
 
 .boton--secundario {
   --boton-borde: var(--color-borde);
-}
-
-.boton--secundario .fondo {
-  background: var(--color-superficie);
 }
 
 .boton--fantasma {
@@ -115,122 +64,62 @@
 
 /* ---------- Estados ---------- */
 @media (hover: hover) {
-  .boton:not(:disabled):not(.cargando):hover {
-    transform: translateY(-2px) scale(1.02);
+  .boton--primario:not(:disabled):not(.cargando):hover {
+    --boton-fondo: color-mix(in srgb, var(--color-primario) 86%, var(--color-texto));
   }
 
-  .boton:not(:disabled):not(.cargando):hover .destello {
-    animation: destellar 900ms var(--easing-salida);
+  .boton--secundario:not(:disabled):hover,
+  .boton--fantasma:not(:disabled):hover {
+    --boton-fondo: color-mix(in srgb, var(--color-primario) 10%, transparent);
   }
 
-  .boton--secundario:not(:disabled):hover .fondo,
-  .boton--fantasma:not(:disabled):hover .fondo {
-    background: color-mix(in srgb, var(--color-primario-1) 16%, var(--color-superficie));
-  }
-
-  .boton--peligro:not(:disabled):hover .fondo {
-    background: color-mix(in srgb, var(--color-error) 12%, transparent);
+  .boton--peligro:not(:disabled):hover {
+    --boton-fondo: color-mix(in srgb, var(--color-error) 10%, transparent);
   }
 }
 
 .boton:not(:disabled):not(.cargando):active {
-  transform: scale(0.96);
-  transition-duration: 60ms;
+  transform: scale(0.98);
 }
 
 .boton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
-.boton:disabled .flujo {
-  animation: none;
-  filter: grayscale(0.6);
-}
-
-/* ---------- Cargando: el contenido se pone y sale un sol que gira con rayos que laten ---------- */
+/* Cargando: el texto cambia y tres puntos esperan, como una frase que aún no termina. */
 .cargando {
   cursor: progress;
 }
 
-.cargando .contenido {
-  opacity: 0;
-  transform: translateY(16px);
+.puntos {
+  display: inline-flex;
+  gap: 3px;
 }
 
-.cargando .flujo {
-  animation-duration: 1.4s;
-}
-
-.sol {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 34px;
-  height: 34px;
-  margin: -17px;
-  opacity: 0;
-  transform: translateY(18px) scale(0.6);
-  transition:
-    opacity var(--duracion-media),
-    transform var(--duracion-lenta) var(--easing-resorte);
-  pointer-events: none;
-}
-
-.cargando .sol {
-  opacity: 1;
-  transform: none;
-}
-
-.sol__disco {
-  position: absolute;
-  inset: 9px;
+.puntos i {
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: var(--boton-texto);
+  background: currentColor;
+  animation: esperar 1.2s var(--easing-suave) infinite;
 }
 
-.sol__rayos {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: repeating-conic-gradient(var(--boton-texto) 0 10deg, transparent 10deg 45deg);
-  -webkit-mask: radial-gradient(circle, transparent 52%, #000 54%);
-  mask: radial-gradient(circle, transparent 52%, #000 54%);
-  animation:
-    girar 2.4s linear infinite,
-    latir 900ms var(--easing-suave) infinite alternate;
+.puntos i:nth-child(2) {
+  animation-delay: 0.15s;
 }
 
-/* Se desplaza dos tercios (el ancho de un ciclo coral→mango) para que el bucle no se note. */
-@keyframes fluir {
-  to {
-    transform: translateX(-66.6667%);
-  }
+.puntos i:nth-child(3) {
+  animation-delay: 0.3s;
 }
 
-@keyframes destellar {
-  0% {
-    opacity: 1;
-    transform: translateX(0) skewX(-18deg);
-  }
+@keyframes esperar {
+  0%,
+  60%,
   100% {
+    opacity: 0.3;
+  }
+  30% {
     opacity: 1;
-    transform: translateX(450%) skewX(-18deg);
-  }
-}
-
-@keyframes girar {
-  to {
-    rotate: 360deg;
-  }
-}
-
-@keyframes latir {
-  from {
-    scale: 0.82;
-  }
-  to {
-    scale: 1.08;
   }
 }

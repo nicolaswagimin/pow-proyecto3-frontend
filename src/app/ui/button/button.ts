@@ -37,7 +37,6 @@ export class Button {
     }
   }
 
-  // Centro del botón en pantalla: origen de las celebraciones.
   centro(): { x: number; y: number } {
     const caja = this.boton().nativeElement.getBoundingClientRect();
     return { x: caja.left + caja.width / 2, y: caja.top + caja.height / 2 };

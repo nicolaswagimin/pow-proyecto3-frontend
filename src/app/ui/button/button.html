@@ -9,15 +9,12 @@
   [attr.aria-busy]="cargando() || null"
   (click)="alHacerClic($event)"
 >
-  <span class="fondo" aria-hidden="true"
-    ><span class="flujo"></span><span class="destello"></span
-  ></span>
-  <span class="contenido" [attr.aria-hidden]="cargando() || null"><ng-content /></span>
-  <span class="sol" aria-hidden="true">
-    <span class="sol__rayos"></span>
-    <span class="sol__disco"></span>
-  </span>
   @if (cargando()) {
-    <span class="visually-hidden">{{ textoCargando() }}</span>
+    <span class="contenido" role="status">
+      {{ textoCargando() }}
+      <span class="puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+    </span>
+  } @else {
+    <span class="contenido"><ng-content /></span>
   }
 </button>
