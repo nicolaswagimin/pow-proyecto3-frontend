@@ -1,0 +1,102 @@
+:host {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 28px;
+}
+
+.titulo {
+  font-size: var(--text-sm);
+  font-weight: var(--peso-fuerte);
+  color: var(--color-texto-suave);
+}
+
+/* ---------- Piloto REC ---------- */
+.rec {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-rec);
+  color: var(--color-rec-contraste);
+  font-size: var(--text-xs);
+  font-weight: var(--peso-fuerte);
+  letter-spacing: 0.04em;
+}
+
+.rec__piloto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Mientras detecta voz, el piloto late: dice "te estoy oyendo", no es decoración. */
+.rec--voz .rec__piloto {
+  animation: latir 900ms var(--easing-suave) infinite;
+}
+
+/* ---------- Líneas del guion ---------- */
+.lineas {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.linea {
+  display: grid;
+  gap: var(--space-1);
+  max-width: 46ch;
+  font-family: var(--font-voz);
+  font-size: var(--text-xl);
+  line-height: 1.35;
+}
+
+.quien {
+  font-family: var(--font-texto);
+  font-size: var(--text-xs);
+  font-weight: var(--peso-fuerte);
+  color: var(--color-texto-suave);
+}
+
+.dicho::before {
+  content: '«';
+}
+
+.dicho::after {
+  content: '»';
+}
+
+.interino {
+  font-style: italic;
+  color: var(--color-interino);
+}
+
+/* Las respuestas de la app no son voz: van en la letra de la interfaz. */
+.linea--app {
+  font-family: var(--font-texto);
+  font-size: var(--text-base);
+  color: var(--color-texto-suave);
+}
+
+.linea--app .dicho::before,
+.linea--app .dicho::after {
+  content: none;
+}
+
+.vacio {
+  font-family: var(--font-voz);
+  font-style: italic;
+  color: var(--color-interino);
+}
+
+@keyframes latir {
+  50% {
+    opacity: 0.35;
+  }
+}
