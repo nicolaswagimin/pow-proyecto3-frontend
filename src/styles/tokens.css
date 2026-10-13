@@ -60,15 +60,17 @@
   --space-12: 3rem;
   --space-16: 4rem;
 
-  /* ---------- Radios: formas suaves como dunas ---------- */
-  --radius-control: 16px;
-  --radius-panel: 32px;
+  /* ---------- Radios por jerarquía ---------- */
+  /* Bloques de maqueta: esquinas suaves pero firmes, como piezas que encajan. */
+  --radius-control: 8px;
+  --radius-panel: 14px;
   --radius-pill: 999px;
 
-  /* ---------- Sombras cálidas ---------- */
-  --shadow-elevacion-1: 0 6px 18px -8px rgb(122 40 60 / 0.35);
-  --shadow-elevacion-2: 0 30px 70px -28px rgb(122 40 60 / 0.45);
-  --shadow-brillo: 0 0 30px rgb(255 122 89 / 0.45);
+  /* ---------- Sombras ---------- */
+  /* La hoja sobre la mesa del estudio: una sombra corta y neutra. */
+  --shadow-elevacion-1: 0 1px 2px rgb(22 24 29 / 0.08), 0 2px 8px -4px rgb(22 24 29 / 0.16);
+  --shadow-elevacion-2: 0 1px 2px rgb(22 24 29 / 0.08), 0 16px 40px -24px rgb(22 24 29 / 0.35);
+  --shadow-brillo: none;
 
   /* ---------- Movimiento ---------- */
   --duracion-rapida: 120ms;
