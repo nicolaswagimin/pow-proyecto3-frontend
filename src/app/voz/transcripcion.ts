@@ -23,9 +23,12 @@ export interface LineaTranscripcion {
       }
     </div>
     <div class="lineas">
-      @for (linea of lineas(); track linea.id) {
+      @for (linea of lineas(); track linea.id; let i = $index) {
         <p class="linea" [class.linea--app]="linea.quien === 'app'">
-          <span class="quien">{{ linea.quien === 'tu' ? 'Tú' : 'VoiceToWeb' }}</span>
+          <!-- Quién habla solo se repite cuando cambia, como en un guion. -->
+          @if (i === 0 || lineas()[i - 1].quien !== linea.quien) {
+            <span class="quien">{{ linea.quien === 'tu' ? 'Tú' : 'VoiceToWeb' }}</span>
+          }
           <!-- prettier-ignore -->
           <span class="dicho">{{ linea.texto }}@if (linea.interino) {<span class="interino">{{ (linea.texto ? ' ' : '') + linea.interino }}</span>}</span>
         </p>
