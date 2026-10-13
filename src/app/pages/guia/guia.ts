@@ -1,19 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  afterNextRender,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, afterNextRender, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { APP_NOMBRE } from '../../config';
 import { leerToken } from '../../core/movimiento';
-import { Estallido } from '../../fx/estallido/estallido';
-import { Cielo } from '../../fx/cielo/cielo';
 import { Alert } from '../../ui/alert/alert';
 import { Avatar } from '../../ui/avatar/avatar';
 import { Button } from '../../ui/button/button';
@@ -21,35 +11,39 @@ import { Icon, NombreIcono } from '../../ui/icon/icon';
 import { PasswordField } from '../../ui/password-field/password-field';
 import { TextField } from '../../ui/text-field/text-field';
 import { ThemeToggle } from '../../ui/theme-toggle/theme-toggle';
+import { LineaTranscripcion, Transcripcion } from '../../voz/transcripcion';
 
 const COLORES = [
   '--color-fondo',
   '--color-superficie',
   '--color-texto',
   '--color-texto-suave',
+  '--color-interino',
   '--color-borde',
-  '--color-primario-1',
-  '--color-primario-2',
+  '--color-maqueta',
+  '--color-primario',
   '--color-primario-contraste',
-  '--color-enlace',
-  '--color-acento',
+  '--color-rec',
   '--color-error',
   '--color-exito',
   '--color-aviso',
   '--color-foco',
-  '--cielo-alto',
-  '--duna-2',
 ];
 
-// Guía de estilo viva: tokens y cada componente en todos sus estados. No se enlaza desde la app.
+// Una transcripción con cada tipo de línea: lo confirmado, lo interino y la respuesta de la app.
+const LINEAS: LineaTranscripcion[] = [
+  { id: 1, quien: 'tu', texto: 'Quiero una página con un formulario de contacto' },
+  { id: 2, quien: 'tu', texto: 'y un título', interino: 'en azul' },
+  { id: 3, quien: 'app', texto: 'Listo: título y formulario de contacto.' },
+];
+
+// Guía de estilo viva: tokens, notación y cada componente en todos sus estados. No se enlaza desde la app.
 @Component({
   selector: 'app-guia',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     RouterLink,
-    Cielo,
-    Estallido,
     Alert,
     Avatar,
     Button,
@@ -57,6 +51,7 @@ const COLORES = [
     PasswordField,
     TextField,
     ThemeToggle,
+    Transcripcion,
   ],
   templateUrl: './guia.html',
   styleUrl: './guia.css',
@@ -87,6 +82,9 @@ export class Guia {
     'mas',
     'mayus',
   ];
+  protected readonly lineas = LINEAS;
+  // El bloque de muestra se puede desarmar y volver a ensamblar.
+  protected readonly ensamblado = signal(true);
 
   protected readonly vacio = new FormControl('', { nonNullable: true });
   protected readonly conValor = new FormControl('ana@ejemplo.com', { nonNullable: true });
@@ -95,11 +93,8 @@ export class Guia {
     { value: 'No editable', disabled: true },
     { nonNullable: true },
   );
-  protected readonly clave = new FormControl('Atardecer2026!', { nonNullable: true });
+  protected readonly clave = new FormControl('Dictado2026!', { nonNullable: true });
   protected readonly cargando = signal(false);
-
-  private readonly muestra = viewChild.required<ElementRef<HTMLElement>>('muestra');
-  private readonly celebracion = viewChild.required(Estallido);
 
   constructor() {
     inject(Title).setTitle(`Guía de diseño · ${APP_NOMBRE}`);
@@ -108,7 +103,7 @@ export class Guia {
 
   // El tema cambia dentro de una View Transition: se espera un momento antes de releer los tokens.
   protected releerColores(): void {
-    setTimeout(() => this.leerColores(), 150);
+    setTimeout(() => this.leerColores(), 300);
   }
 
   private leerColores(): void {
@@ -120,24 +115,8 @@ export class Guia {
     setTimeout(() => this.cargando.set(false), 2200);
   }
 
-  protected demoSacudida(): void {
-    this.muestra().nativeElement.animate(
-      [
-        { transform: 'none' },
-        { transform: 'translateX(-10px) skewX(8deg)', filter: 'blur(1.5px)' },
-        { transform: 'translateX(9px) skewX(-6deg)', filter: 'blur(0.5px)' },
-        { transform: 'translateX(-6px) skewX(4deg)', filter: 'blur(1px)' },
-        { transform: 'none', filter: 'blur(0)' },
-      ],
-      { duration: 520, easing: 'ease-out' },
-    );
-  }
-
-  protected demoCelebracion(evento: MouseEvent): void {
-    const caja = this.muestra().nativeElement.getBoundingClientRect();
-    this.celebracion().lanzar(
-      { x: evento.clientX, y: evento.clientY },
-      { x: caja.left + caja.width / 2, y: caja.top + caja.height / 2 },
-    );
+  protected demoEnsamblar(): void {
+    this.ensamblado.set(false);
+    setTimeout(() => this.ensamblado.set(true), 700);
   }
 }
