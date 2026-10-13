@@ -35,6 +35,8 @@ export class TextField implements ControlValueAccessor {
   readonly multilinea = input(false, { transform: booleanAttribute });
   readonly opcional = input(false, { transform: booleanAttribute });
   readonly maxlength = input<number | null>(null);
+  // Deja espacio a la derecha para un botón proyectado con [campo-accion] (por ejemplo, dictar).
+  readonly conAccion = input(false, { transform: booleanAttribute });
   // Marca el campo como obligatorio para lectores de pantalla (aria-required).
   readonly requerido = input(false, { transform: booleanAttribute });
 

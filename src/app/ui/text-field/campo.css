@@ -48,6 +48,10 @@
   color: var(--color-texto);
 }
 
+.campo--con-accion .campo__control {
+  padding-right: 3.25rem;
+}
+
 textarea.campo__control {
   height: auto;
   min-height: 96px;

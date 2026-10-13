@@ -75,3 +75,34 @@ h1:focus-visible {
   opacity: 1;
   transition: none;
 }
+
+/* ---------- Micrófono dentro del campo de correo ---------- */
+.mic {
+  position: absolute;
+  top: 50%;
+  right: 3px;
+  translate: 0 -50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-texto-suave);
+  --icono-tamano: 1.4rem;
+}
+
+@media (hover: hover) {
+  .mic:hover {
+    color: var(--color-primario);
+    background: color-mix(in srgb, var(--color-primario) 10%, transparent);
+  }
+}
+
+/* Con el micrófono abierto, el botón es el piloto REC: rojo y con texto alternativo propio. */
+.mic--rec,
+.mic--rec:hover {
+  background: var(--color-rec);
+  color: var(--color-rec-contraste);
+}

@@ -1,6 +1,10 @@
 <app-auth-layout>
   <div auth-guion class="guion">
-    <ui-transcripcion [lineas]="dictado.lineas()" />
+    <ui-transcripcion
+      [lineas]="lineas()"
+      [escuchando]="voz.escuchando()"
+      [oyendoVoz]="voz.oyendoVoz()"
+    />
     <div class="guion__acciones">
       @if (dictado.enCurso()) {
         <ui-button variante="fantasma" tamano="compacto" (click)="dictado.saltar()">
@@ -20,7 +24,7 @@
     [class.bloque--maqueta]="!dictado.ensamblado('titulo')"
   >
     <h1 #encabezado tabindex="-1">{{ textos().titulo }}</h1>
-    <p class="subtitulo">{{ textos().subtitulo }}</p>
+    <p class="subtitulo">{{ subtitulo() }}</p>
   </header>
 
   @if (sesionExpirada()) {
@@ -68,8 +72,24 @@
       icono="correo"
       autocomplete="email"
       requerido
+      [conAccion]="voz.disponible"
       [error]="errorDe('email')"
-    />
+    >
+      @if (voz.disponible) {
+        <button
+          campo-accion
+          type="button"
+          class="mic"
+          [class.mic--rec]="voz.escuchando()"
+          [attr.aria-pressed]="voz.escuchando()"
+          [attr.aria-label]="voz.escuchando() ? 'Dejar de dictar' : 'Dictar el correo'"
+          (pointerdown)="$event.preventDefault()"
+          (click)="dictarCorreo()"
+        >
+          <ui-icon nombre="microfono" />
+        </button>
+      }
+    </ui-text-field>
 
     <ui-password-field
       class="bloque"

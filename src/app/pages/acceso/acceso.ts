@@ -27,8 +27,11 @@ import { AuthService } from '../../core/auth.service';
 import { CampoAuth, ErrorInterfaz, mapearError } from '../../core/errores';
 import { AuthLayout } from '../../layouts/auth-layout/auth-layout';
 import { Alert } from '../../ui/alert/alert';
+import { Icon } from '../../ui/icon/icon';
+import { correoHablado } from '../../voz/correo-hablado';
 import { Dictado, Frase } from '../../voz/dictado';
 import { Transcripcion } from '../../voz/transcripcion';
+import { VozService } from '../../voz/voz.service';
 import { Button } from '../../ui/button/button';
 import { PasswordField } from '../../ui/password-field/password-field';
 import { TextField } from '../../ui/text-field/text-field';
@@ -105,6 +108,7 @@ function noVacio(control: AbstractControl<string>): ValidationErrors | null {
     AuthLayout,
     Alert,
     Button,
+    Icon,
     TextField,
     PasswordField,
     Transcripcion,
@@ -148,6 +152,21 @@ export class Acceso {
 
   private primeraVez = true;
   protected readonly dictado = new Dictado();
+  protected readonly voz = inject(VozService);
+  // Mientras la persona dicta, su línea del guion muestra el texto interino del reconocedor.
+  private readonly idEnVivo = signal<number | null>(null);
+  protected readonly lineas = computed(() =>
+    this.dictado
+      .lineas()
+      .map((linea) =>
+        linea.id === this.idEnVivo() ? { ...linea, interino: this.voz.interino() || '…' } : linea,
+      ),
+  );
+  protected readonly subtitulo = computed(() =>
+    this.voz.disponible && this.modoVisible() === 'login'
+      ? `${this.textos().subtitulo} También puedes dictar tu correo.`
+      : this.textos().subtitulo,
+  );
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.dictado.detener());
@@ -176,6 +195,37 @@ export class Acceso {
         if (errores['required']) return 'Escribe tu contraseña.';
         if (errores['maxlength']) return 'La contraseña no puede superar los 72 caracteres.';
         return 'La contraseña necesita al menos 8 caracteres.';
+    }
+  }
+
+  // Dictar el correo: el micrófono se abre, la frase aparece en el guion mientras se reconoce y,
+  // al confirmarse, se convierte en un correo escrito y llena el campo. El teclado siempre sirve.
+  protected async dictarCorreo(): Promise<void> {
+    if (this.voz.escuchando()) {
+      this.voz.detener();
+      return;
+    }
+    this.dictado.saltar();
+    const id = this.dictado.agregar('tu');
+    this.idEnVivo.set(id);
+    this.anunciar('Escuchando. Di tu correo, por ejemplo: ana arroba correo punto com.');
+    try {
+      const dicho = await this.voz.dictar();
+      const correo = correoHablado(dicho);
+      this.dictado.actualizar(id, { texto: dicho });
+      this.dictado.agregar('app', `Correo: ${correo}`);
+      const control = this.form.controls.email;
+      control.setValue(correo);
+      control.markAsTouched();
+      this.anunciar(`Correo dictado: ${correo}. Revísalo antes de continuar.`);
+    } catch (e) {
+      this.dictado.quitar(id);
+      const mensaje = e instanceof Error ? e.message : 'No se pudo dictar. Escribe con el teclado.';
+      this.dictado.agregar('app', mensaje);
+      this.anunciar(mensaje);
+    } finally {
+      this.idEnVivo.set(null);
+      this.campoEmail().enfocar();
     }
   }
 
