@@ -1,95 +1,103 @@
-# Brief de diseño · Proyecto 3 · Hora Dorada
+# Brief de diseño · VoiceToWeb
 
-## Encargo
-- **Pantalla:** acceso (login y registro). Trabajo principal: que alguien entre o cree su cuenta en segundos, y que la primera impresión sea espectacular.
-- **Quién la usa:** un profesor evaluando el proyecto (escritorio) y cualquier persona desde el móvil.
-- **Qué debe sentir:** calidez, brillo, celebración (como llegar a casa al atardecer).
-- **Restricciones:** contraste AA, `prefers-reduced-motion`, 60 fps (solo `transform`/`opacity`), modo claro/oscuro, sin librerías de UI. El tema del proyecto aún no se conoce: el nombre vive en `nombreApp`.
-- **Prioridad del usuario:** muchas animaciones en todos los elementos (sustituye la regla de "un solo momento memorable").
+## El encargo
 
-## Dirección elegida: Hora Dorada
-Un atardecer en el desierto con brillo holográfico: colores cálidos que se mueven como calor sobre la arena, y una tarjeta con reflejo iridiscente como una lámina coleccionable.
+- **Producto:** VoiceToWeb, una herramienta de prototipado web por voz. La persona describe en voz alta la página que quiere, la IA genera el HTML y CSS y lo muestra en vivo. Después la modifica con nuevas órdenes ("cambia el título a azul", "agrega un formulario de contacto"). Usa la Web Speech API, con alternativa de teclado.
+- **Pantallas de este trabajo:** acceso (login y registro), bienvenida de `/app` y guía `/design`.
+- **Trabajo principal del acceso:** que alguien entre o cree su cuenta en segundos y entienda, sin leer un manual, que en esta herramienta se habla y la página se arma.
+- **Quién la usa:** personas que quieren prototipar rápido sin escribir código; en la sustentación, el profesor.
+- **Qué debe sentir:** que hablar basta, que la herramienta escucha y responde, y que todo se puede hacer también con el teclado.
+- **Restricciones:** WCAG 2.2 AA, `prefers-reduced-motion`, modo claro y oscuro, móvil, sin librerías de UI ni de voz.
 
-### Paleta (contraste verificado)
-| Token | Claro (tarde) | Oscuro (crepúsculo) |
+## El problema que resuelve el rediseño
+
+El diseño anterior ("Hora Dorada": cielo de atardecer, dunas, brillo holográfico y estallido de éxito) era genérico y no tenía nada de voz ni de construcción de páginas.
+
+## Dirección elegida: Toma de dictado
+
+**Del guion a la maqueta.** La pantalla tiene dos partes: la **transcripción** (lo que se dijo) y la **maqueta** (lo que se construyó con eso). El vocabulario es el del reconocimiento de voz real:
+
+- El texto **interino** (lo que el reconocedor todavía puede corregir) va en gris e itálica.
+- Al confirmarse, **asienta** en tinta.
+- Cada frase confirmada convierte un **bloque de maqueta** (un rectángulo gris) en el componente real.
+
+El único color cálido es el piloto **REC**, que se enciende solo cuando el micrófono escucha de verdad y late solo mientras detecta voz. No hay ondas de audio decorativas.
+
+### Paleta
+
+| Token | Claro (estudio) | Oscuro (cabina) |
 |---|---|---|
-| fondo | `#FFE9DC` | `#1B0B24` |
-| superficie | `#FFF8F3` | `#2A1436` |
-| texto | `#2A1033` (14.7:1) | `#FFF1E8` (17:1) |
-| texto-2 | `#6B4A6E` (7.1:1) | `#D9B8C9` (9.3:1) |
-| primario (degradado) | `#FF7A59` → `#FFB627`, texto `#2A1033` (6.7:1 o más) | `#FF7A6B` → `#FFC94A`, texto `#1B0B24` (7.4:1 o más) |
-| acento | `#C2185B` (5.6:1) | `#FF4F8B` |
-| error | `#B3122E` | `#FF8FA0` |
-| éxito | `#2E7D32` | `#7BE0A0` |
+| fondo / superficie | `#EFF1F5` / `#FFFFFF` | `#121418` / `#1B1E24` |
+| texto | `#16181D`: 17.8:1 | `#ECEEF2`: 14.4:1 |
+| texto suave | `#4B5263`: 7.8:1 | `#A3A9B8`: 7.1:1 |
+| interino | `#6B7280`: 4.8:1 | `#8B92A3`: 5.4:1 |
+| primario (ultramar) | `#2F3FD0`, texto blanco 7.7:1 | `#8C98FF`, texto `#121418` 7.1:1 |
+| REC | `#C8261B`, texto blanco 5.6:1 | `#FF6B5E`, texto `#121418` 6.6:1 |
+| maqueta (decorativo) | `#D5D9E0` | `#2A2E37` |
 
-### Tipografía (solo estos pesos)
-- **Bricolage Grotesque** 600 y 800: títulos. Expresiva, cálida e irregular.
-- **DM Sans** 400, 500 y 700: texto, labels y botones.
+Contrastes medidos sobre la superficie, que es donde vive todo el texto. La lista completa está en [design-system.md](design-system.md).
+
+### Tipografía
+
+- **Schibsted Grotesk** (400 y 700): la interfaz, lo que se construye.
+- **Newsreader** (400, normal e itálica): la voz. Lo dicho se lee como un guion o una cita, entre comillas angulares. La itálica marca lo interino.
+
+Son dos familias claramente distintas y cada una tiene un rol: si algo está en Newsreader, alguien lo dijo.
 
 ### Composición
-Escritorio (pantalla dividida)
+
 ```
-┌──────────────────────────────┬───────────────────────────────┐
-│ ☀ nombreApp                  │                      [tema]   │
-│        .-""""-.              │   Hola otra vez               │
-│      /  ☀ ☀   \  rayos       │   Entra para seguir           │
-│     |  sol que  | girando    │   ╔ Correo ═══════════════╗   │
-│      \ respira /             │   ╚═══════════════════════╝   │
-│        '-....-'              │   ╔ Contraseña ════════ 👁 ╗   │
-│  ～～～～～～～～～～～～～～  │   ╚═══════════════════════╝   │
-│ ～～ dunas ondulando ～～～～ │   [▓▒░ Iniciar sesión ░▒▓]   │
-│ ～～～～～～～～～～～～～～～ │   ¿Sin cuenta? Crear una     │
-└──────────────────────────────┴───────────────────────────────┘
-          (en registro, el panel del sol se desliza a la derecha)
-```
-Móvil
-```
-┌────────────────────┐
-│ ☀ nombreApp  [tema]│
-│    .-""-.  ☀       │
-│ ～～～ dunas ～～～ │
-├────────────────────┤
-│ Hola otra vez      │
-│╔ Correo ═════════╗ │
-│╚═════════════════╝ │
-│╔ Contraseña ══ 👁╗ │
-│╚═════════════════╝ │
-│[▓ Iniciar sesión ▓]│
-│ Crear una cuenta   │
-└────────────────────┘
+Escritorio                                         Móvil
+┌───────────────────────────────────────────────┐  ┌──────────────────┐
+│ ❝▣ VoiceToWeb                            [⫼]  │  │ ❝▣ VoiceToWeb [⫼]│
+│ ┌──────────────────┬────────────────────────┐ │  │ Transcripción    │
+│ │ Transcripción REC│                        │ │  │ «…un botón para  │
+│ │ Tú               │   Inicia sesión        │ │  │  entrar»         │
+│ │ «Quiero una      │   Esta página se arma… │ │  │ «y un enlace…»   │
+│ │  página para…»   │   Correo               │ │  │ Repetir dictado  │
+│ │ «con un campo    │   [______________][🎙] │ │  │──────────────────│
+│ │  para mi correo» │   Contraseña           │ │  │ Inicia sesión    │
+│ │ «y otro para la  │   [▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒]   │ │  │ Correo     [🎙]  │
+│ │  contraseña…»    │   [▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒]   │ │  │ Contraseña       │
+│ │ Saltar el dictado│   ← bloques sin armar  │ │  │ [Iniciar sesión] │
+│ └──────────────────┴────────────────────────┘ │  └──────────────────┘
+└───────────────────────────────────────────────┘
 ```
 
-### Animaciones
-- **Fondo:** malla de degradados en CSS con blobs cálidos difuminados que se mueven, tres capas de dunas en SVG que ondulan (dos en móvil) y un sol que respira con rayos girando.
-- **Entrada:** amanecer orquestado. El sol sube desde detrás de las dunas, el cielo pasa de ciruela a durazno y los campos aparecen de abajo hacia arriba con un desenfoque que se aclara.
-- **Tarjeta:** reflejo holográfico con un brillo `conic-gradient` que sigue al mouse y una inclinación 3D sutil.
-- **Login ↔ registro:** el panel del sol cruza de lado con una curva de resorte que se pasa un poco y vuelve, y el formulario entra desde el lado contrario. En móvil, la banda del sol se pliega y se despliega.
-- **Campos:** label flotante con desenfoque, borde degradado cónico que gira al enfocar y un ícono que sube y brilla.
-- **Botón:** un destello recorre el degradado y este se desplaza en continuo. Al enviar se transforma en un sol que gira con rayos que laten.
-- **Medidor de contraseña:** un sol que sube por el arco del horizonte, con el cielo pasando de ciruela a dorado.
-- **Mostrar contraseña:** ojo con pupila-sol; al abrirlo, los rayos se expanden.
-- **Error:** sacudida tipo espejismo con un temblor y distorsión breve, y el mensaje se aclara desde un desenfoque con resplandor rosa.
-- **Éxito:** estallido solar con rayos radiales, fuegos artificiales de partículas doradas y un check dentro de un sol.
-- **Bienvenida en `/app`:** amanecer detrás del avatar y el nombre con un barrido dorado.
-- **Tema:** el sol se pone tras una duna y sale la luna con estrellas que titilan (y al revés).
+En escritorio el guion va a la izquierda, como el texto de un apuntador. En móvil va arriba y muestra solo las dos últimas frases, para que el formulario quede a la vista.
 
-### Rendimiento y accesibilidad
-- Los blobs y las dunas se pausan con `visibilitychange`, y hay menos capas en móvil.
-- El brillo holográfico se actualiza dentro de `requestAnimationFrame`.
-- En dispositivos táctiles se desactivan la inclinación 3D y el brillo que sigue al cursor.
-- Con `prefers-reduced-motion`, el cielo queda estático, el panel cambia con un fundido y no hay fuegos artificiales.
-- El tema recuerda la elección en `localStorage`; la primera vez usa `prefers-color-scheme`.
+### El login es una demostración del producto
+
+1. Al abrir el acceso, el guion se dicta solo, frase por frase: «Quiero una página para entrar a mi cuenta, con un campo para mi correo y otro para la contraseña. Abajo, un botón para entrar y un enlace para crear una cuenta.»
+2. Cada frase aparece palabra por palabra como texto interino y, al confirmarse, convierte su bloque de maqueta en el componente real.
+3. Los campos se pueden usar desde el primer instante: el rectángulo gris no recibe clics y, al enfocar cualquier campo, el dictado termina. Hay botones para saltar y repetir el dictado.
+4. **Se puede dictar el correo.** Si el navegador soporta la Web Speech API, el campo tiene un micrófono. Al pulsarlo se enciende REC y lo que dices aparece en el guion como texto interino. "Ana arroba correo punto com" se convierte en `ana@correo.com` y llena el campo. Sin permiso, sin micrófono o sin soporte, la app lo dice y el teclado funciona igual.
+5. Al pasar a registro, el guion dicta "Agrega un campo para el nombre" y ese bloque se ensambla: la página se edita por voz.
+6. Las respuestas de la app (errores, sesión iniciada) quedan en el guion, en la letra de la interfaz.
+
+### Extensión a `/app`
+
+`/app` usa la misma hoja: a la izquierda, el guion de la sesión; a la derecha, el contenido. "Pregúntale a la IA" sube al primer lugar y suma un micrófono para **dictar la pregunta**: es la primera parte del producto que ya funciona por voz. El estado del sistema se lee con ícono y resultado en texto. Un registro nuevo se ensambla desde un bloque de maqueta.
+
+## Revisión contra lo genérico
+
+| Default genérico | Qué se hizo |
+|---|---|
+| Onda de audio o ecualizador animado | No hay ondas decorativas. El único indicador de audio es REC, ligado a eventos reales (escuchando, detectando voz). |
+| Partículas, auroras, vidrio, confeti | Nada de eso. El fondo es una hoja de estudio. |
+| Tarjeta 3D o botón magnético | Ningún efecto de cursor. |
+| Serif de alto contraste "editorial" | Newsreader no decora titulares: solo se usa para lo dicho, que es lo que la distingue. |
+| Degradado morado-azul de "IA" | Un ultramar plano y un gris de maqueta. |
+
+## Direcciones descartadas
+
+- **Partitura:** la voz como pentagrama y los bloques como notas. Se descartó porque la metáfora musical no tiene que ver con dictar una página y obliga a explicar la notación.
+- **Subtítulos de cine:** texto blanco sobre franja negra al pie de la pantalla. Se descartó porque ocupa el lugar del formulario en móvil y su estética de video no ayuda a construir páginas.
 
 ## Textos
-- Login: "Hola otra vez" / "Entra para seguir donde lo dejaste". Botón "Iniciar sesión". Enlace "¿Sin cuenta? Crear una".
-- Registro: "Crea tu cuenta" / "Tu lugar está listo". Botón "Crear cuenta". Enlace "¿Ya tienes cuenta? Inicia sesión".
-- Errores: los mismos mensajes que en el resto del sistema (credenciales, correo duplicado, contraseña corta, correo inválido, servidor caído, demasiados intentos).
 
-## Direcciones de los otros proyectos (no reutilizar aquí)
-- **Bioluminiscencia (Proyecto 1):** océano nocturno con plancton en canvas, vidrio cáustico, morph líquido y burbujas.
-- **Constructiva (Proyecto 2):** póster Bauhaus con geometría primaria, giro 3D de dos caras y confeti geométrico.
-
-## Cómo re-tematizar
-- Cambia los dos extremos del degradado primario y el acento en `src/styles/tokens.css`. El cielo, las dunas y los fuegos artificiales usan esos tokens.
-- Cambia las familias en `--font-display` y `--font-texto`.
-- Cambia `nombreApp` y los textos del saludo.
+- Login: "Inicia sesión" / "Esta página se arma con lo que se dicta en el guion. También puedes dictar tu correo." Botón "Iniciar sesión". Enlace "¿No tienes cuenta? Crea una".
+- Registro: "Crea tu cuenta" / "El campo del nombre se agregó por dictado." Botón "Crear cuenta".
+- Guion: "Saltar el dictado", "Repetir el dictado", "Dictar el correo", "Dejar de dictar".
+- Voz: "Escuchando. Di tu correo, por ejemplo: ana arroba correo punto com.", "Correo dictado: … Revísalo antes de continuar.", "No tengo permiso para usar el micrófono. Puedes escribir con el teclado.", "No te escuché. Inténtalo de nuevo o escribe con el teclado."
+- Errores del acceso: los mismos de los otros proyectos ("El correo o la contraseña no coinciden.", etc.).
