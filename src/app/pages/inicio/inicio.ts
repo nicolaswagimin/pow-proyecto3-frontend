@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -7,7 +14,6 @@ import { environment } from '../../../environments/environment';
 import { APP_NOMBRE } from '../../config';
 import { AuthService } from '../../core/auth.service';
 import { mapearError } from '../../core/errores';
-import { Cielo } from '../../fx/cielo/cielo';
 import { ApiService, Estado, Item } from '../../services/api.service';
 import { Alert } from '../../ui/alert/alert';
 import { Avatar } from '../../ui/avatar/avatar';
@@ -15,6 +21,9 @@ import { Button } from '../../ui/button/button';
 import { Icon } from '../../ui/icon/icon';
 import { TextField } from '../../ui/text-field/text-field';
 import { ThemeToggle } from '../../ui/theme-toggle/theme-toggle';
+import { Dictado } from '../../voz/dictado';
+import { Transcripcion } from '../../voz/transcripcion';
+import { VozService } from '../../voz/voz.service';
 
 @Component({
   selector: 'app-inicio',
@@ -23,13 +32,13 @@ import { ThemeToggle } from '../../ui/theme-toggle/theme-toggle';
     DatePipe,
     ReactiveFormsModule,
     RouterLink,
-    Cielo,
     Alert,
     Avatar,
     Button,
     Icon,
     TextField,
     ThemeToggle,
+    Transcripcion,
   ],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
@@ -47,9 +56,36 @@ export class Inicio {
     () => (this.usuario()?.nombre ?? '').trim().split(/\s+/)[0] || 'de nuevo',
   );
 
+  // Guion de la sesión: lo dictado y las respuestas de la app, como en el acceso.
+  protected readonly voz = inject(VozService);
+  private readonly dictado = new Dictado();
+  private readonly idEnVivo = signal<number | null>(null);
+  protected readonly lineas = computed(() =>
+    this.dictado
+      .lineas()
+      .map((linea) =>
+        linea.id === this.idEnVivo() ? { ...linea, interino: this.voz.interino() || '…' } : linea,
+      ),
+  );
+  private readonly campoPregunta = viewChild.required<TextField>('campoPregunta');
+
   // Estado de conexión
   protected readonly estado = signal<Estado | null>(null);
   protected readonly cargandoEstado = signal(true);
+  protected readonly puntosEstado = computed(() => {
+    const estado = this.estado();
+    const revisando = this.cargandoEstado();
+    const punto = (nombre: string, ok: boolean | undefined, falla: string) => ({
+      nombre,
+      estado: revisando ? 'revisando' : ok ? 'ok' : 'falla',
+      resultado: revisando ? 'Revisando…' : ok ? 'Responde' : falla,
+    });
+    return [
+      punto('Backend', estado?.ok, 'No responde'),
+      punto('Base de datos', estado?.db, estado ? 'No responde' : 'Sin datos'),
+      punto('IA', estado?.ia, estado ? 'Sin configurar' : 'Sin datos'),
+    ];
+  });
 
   // Registros
   protected readonly items = signal<Item[]>([]);
@@ -71,6 +107,33 @@ export class Inicio {
     inject(Title).setTitle(`Inicio · ${APP_NOMBRE}`);
     this.auth.refrescarUsuario();
     this.revisarEstado();
+    this.dictado.agregar(
+      'app',
+      `Hola, ${this.primerNombre()}. ${this.voz.disponible ? 'Dicta' : 'Escribe'} una pregunta para la IA.`,
+    );
+  }
+
+  // Dictar la pregunta: la frase aparece en el guion mientras se reconoce y, al confirmarse, se
+  // agrega al campo. El teclado siempre sirve.
+  protected async dictarPregunta(): Promise<void> {
+    if (this.voz.escuchando()) {
+      this.voz.detener();
+      return;
+    }
+    const id = this.dictado.agregar('tu');
+    this.idEnVivo.set(id);
+    try {
+      const dicho = await this.voz.dictar();
+      this.dictado.actualizar(id, { texto: dicho });
+      const control = this.formIA.controls.pregunta;
+      control.setValue([control.value.trim(), dicho].filter(Boolean).join(' '));
+    } catch (e) {
+      this.dictado.quitar(id);
+      this.dictado.agregar('app', e instanceof Error ? e.message : 'No se pudo dictar.');
+    } finally {
+      this.idEnVivo.set(null);
+      this.campoPregunta().enfocar();
+    }
   }
 
   protected revisarEstado(): void {
@@ -140,10 +203,13 @@ export class Inicio {
       next: ({ respuesta }) => {
         this.respuesta.set(respuesta);
         this.pensando.set(false);
+        this.dictado.agregar('app', 'La IA respondió. La respuesta está bajo la pregunta.');
       },
       error: (err) => {
-        this.errorIA.set(mapearError(err).mensaje);
+        const mensaje = mapearError(err).mensaje;
+        this.errorIA.set(mensaje);
         this.pensando.set(false);
+        this.dictado.agregar('app', mensaje);
       },
     });
   }
