@@ -2,7 +2,42 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Los commits siguen Conventional Commits.
 
-## [Sin publicar] · 2026-10-12
+## [Sin publicar] · 2026-10-19 · Funcionalidad completa
+
+El estudio de VoiceToWeb: dictar una página, verla armarse en vivo y cambiarla con la voz.
+
+### Agregado
+- **`/app` rediseñado** alrededor de un gran micrófono:
+  - anillos que siguen el volumen real (Web Audio);
+  - transcripción palabra por palabra, editable antes de enviar;
+  - variante del español (es-CO por defecto);
+  - ejemplos de un clic;
+  - aviso y teclado cuando no hay Web Speech API.
+- **Ventana de navegador** con el nombre del proyecto y los anchos móvil, tablet y escritorio. Iframe `sandbox=""` sin ningún permiso, con saneado a punto fijo y CSP sin scripts.
+- **Construcción en vivo:** la página se arma por bloques `data-vtw` a medida que llega el stream de Gemini, con el progreso visible. Si un proxy retiene o corta el stream, hay una alternativa automática (`?stream=0`) que muestra el progreso igual.
+- **Edición por voz** con resaltado de los bloques que cambiaron y su anuncio.
+- **Versiones en árbol:** volver a cualquiera, deshacer y rehacer sin perder ninguna.
+- **Comandos de control por voz,** sin IA: deshacer, rehacer, nueva página y descargar.
+- **Proyectos guardados** automáticamente con todas sus versiones, y la página `/proyectos` (abrir, renombrar y borrar).
+- **Descargar y copiar:** el HTML saneado.
+- **Errores claros y amables:** micrófono denegado, sin micrófono, sin conexión, cuota, respuesta inválida (con «Reintentar») y sesión.
+- **Barra compartida** con «Mis proyectos», e íconos nuevos.
+- **107 pruebas** con Vitest y jsdom (`npm test`).
+- **Documentación:**
+  - nuevos: `funcionalidades.md`, `voz.md`, `vista-previa.md`, `versiones.md` y las ADR 0005 a 0008;
+  - actualizados: `arquitectura-frontend.md`, `accesibilidad.md` (28 de 28 auditorías sin violaciones), la ADR 0004 y las capturas.
+
+### Cambiado
+- La ADR 0004 se actualiza: la voz se visualiza porque ahora se mide el volumen real.
+
+### Eliminado
+- `services/api.service.ts` (items y la pregunta genérica a la IA) y la vieja pantalla de `/app`.
+
+### Corregido
+- Angular saneaba `srcdoc` por su cuenta y la página se veía sin estilos.
+- Las hojas de Google Fonts se neutralizaban junto con los enlaces.
+
+## 2026-10-12
 
 Rediseño de identidad: de "Hora Dorada" (atardecer sin relación con el tema) a **VoiceToWeb**, con la dirección "Toma de dictado".
 
