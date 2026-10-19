@@ -1,0 +1,141 @@
+:host {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  --tamano: clamp(96px, 22vw, 132px);
+}
+
+.microfono__escena {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(var(--tamano) * 2.2);
+  height: calc(var(--tamano) * 2.2);
+}
+
+.microfono__escena--compacta {
+  --tamano: 72px;
+  width: calc(var(--tamano) * 1.9);
+  height: calc(var(--tamano) * 1.9);
+}
+
+.microfono {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--tamano);
+  height: var(--tamano);
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-primario);
+  color: var(--color-primario-contraste);
+  box-shadow: var(--shadow-elevacion-2);
+  cursor: pointer;
+  --icono-tamano: calc(var(--tamano) * 0.42);
+  transition:
+    background var(--duracion-media) var(--easing-salida),
+    transform var(--duracion-rapida) var(--easing-salida);
+}
+
+.microfono:active {
+  transform: scale(0.96);
+}
+
+.microfono:focus-visible {
+  outline: 3px solid var(--color-foco);
+  outline-offset: 4px;
+}
+
+.microfono:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Escuchando: el micrófono se vuelve REC, el único color cálido de la identidad. */
+.microfono[aria-pressed='true'] {
+  background: var(--color-rec);
+  color: var(--color-rec-contraste);
+}
+
+/* Los anillos: su tamaño sale del volumen real (--nivel, de 0 a 1). Sin escuchar no se ven. */
+.anillo {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: var(--tamano);
+  height: var(--tamano);
+  border: 2px solid var(--color-rec);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    transform 90ms linear,
+    opacity var(--duracion-media) var(--easing-salida);
+  pointer-events: none;
+}
+
+.microfono__escena--escucha .anillo {
+  opacity: calc(0.25 + var(--nivel) * 0.6);
+}
+
+.microfono__escena--escucha .anillo--1 {
+  transform: translate(-50%, -50%) scale(calc(1.08 + var(--nivel) * 0.35));
+}
+
+.microfono__escena--escucha .anillo--2 {
+  transform: translate(-50%, -50%) scale(calc(1.16 + var(--nivel) * 0.7));
+  opacity: calc(0.15 + var(--nivel) * 0.45);
+}
+
+.microfono__escena--escucha .anillo--3 {
+  transform: translate(-50%, -50%) scale(calc(1.24 + var(--nivel) * 1));
+  opacity: calc(0.08 + var(--nivel) * 0.3);
+}
+
+/* El vúmetro solo aparece con movimiento reducido: muestra el volumen sin animar nada. */
+.vumetro {
+  display: none;
+  gap: 4px;
+  align-items: end;
+  height: 20px;
+}
+
+.vumetro__paso {
+  width: 8px;
+  border-radius: 2px;
+  background: var(--color-maqueta);
+}
+
+.vumetro__paso:nth-child(1) {
+  height: 6px;
+}
+.vumetro__paso:nth-child(2) {
+  height: 9px;
+}
+.vumetro__paso:nth-child(3) {
+  height: 12px;
+}
+.vumetro__paso:nth-child(4) {
+  height: 16px;
+}
+.vumetro__paso:nth-child(5) {
+  height: 20px;
+}
+
+.vumetro__paso--activo {
+  background: var(--color-rec);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anillo {
+    display: none;
+  }
+
+  .microfono {
+    transition: none;
+  }
+
+  .vumetro {
+    display: flex;
+  }
+}

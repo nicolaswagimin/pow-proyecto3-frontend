@@ -1,0 +1,25 @@
+<div
+  class="microfono__escena"
+  [class.microfono__escena--compacta]="compacto()"
+  [class.microfono__escena--escucha]="escuchando()"
+  [style.--nivel]="nivelVisible()"
+>
+  <span class="anillo anillo--1" aria-hidden="true"></span>
+  <span class="anillo anillo--2" aria-hidden="true"></span>
+  <span class="anillo anillo--3" aria-hidden="true"></span>
+  <button
+    type="button"
+    class="microfono"
+    [attr.aria-pressed]="escuchando()"
+    [attr.aria-label]="escuchando() ? 'Dejar de escuchar' : 'Dictar una orden'"
+    [disabled]="deshabilitado()"
+    (click)="pulsar.emit()"
+  >
+    <ui-icon nombre="microfono" />
+  </button>
+</div>
+<div class="vumetro" aria-hidden="true">
+  @for (activo of pasos(); track $index) {
+    <span class="vumetro__paso" [class.vumetro__paso--activo]="activo"></span>
+  }
+</div>
