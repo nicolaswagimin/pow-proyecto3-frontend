@@ -1,0 +1,29 @@
+<div class="ventana">
+  <div class="ventana__barra">
+    <span class="ventana__puntos" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span class="ventana__nombre">{{ nombre() }}</span>
+    <div class="anchos" role="group" aria-label="Ancho de la vista previa">
+      @for (a of ANCHOS; track a.id) {
+        <button type="button" [attr.aria-pressed]="ancho() === a.id" (click)="ancho.set(a.id)">
+          <ui-icon [nombre]="a.icono" />
+          <span class="anchos__texto">{{ a.nombre }}</span>
+        </button>
+      }
+    </div>
+  </div>
+  <div class="ventana__lienzo">
+    <div class="ventana__marco" [style.width]="anchoPx() ? anchoPx() + 'px' : '100%'">
+      @if (documento(); as doc) {
+        <iframe
+          class="ventana__iframe"
+          sandbox=""
+          [attr.srcdoc]="doc"
+          [title]="'Vista previa de ' + nombre()"
+        ></iframe>
+      } @else {
+        <p class="ventana__vacio">{{ vacio() }}</p>
+      }
+    </div>
+    <ng-content />
+  </div>
+</div>

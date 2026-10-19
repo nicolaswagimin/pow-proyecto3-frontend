@@ -1,0 +1,143 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+/* Una ventana de navegador sobre la hoja: borde de tinta, barra de fondo y la página en blanco. */
+.ventana {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  border: 2px solid var(--color-texto);
+  border-radius: var(--radius-panel);
+  background: var(--color-superficie);
+  box-shadow: var(--shadow-elevacion-2);
+}
+
+.ventana__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 2px solid var(--color-texto);
+  background: var(--color-fondo);
+}
+
+.ventana__puntos {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.ventana__puntos span {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-texto-suave);
+  border-radius: 50%;
+}
+
+.ventana__nombre {
+  flex: 1 1 8rem;
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-superficie);
+  color: var(--color-texto-suave);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anchos {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.anchos button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-texto-suave);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--peso-fuerte);
+  cursor: pointer;
+}
+
+.anchos button[aria-pressed='true'] {
+  background: var(--color-superficie);
+  box-shadow: inset 0 0 0 2px var(--color-texto);
+  color: var(--color-texto);
+}
+
+.anchos button:focus-visible {
+  outline: 2px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .anchos button:hover {
+    color: var(--color-texto);
+  }
+}
+
+/* En pantallas angostas los anchos quedan solo con su ícono (el nombre sigue para el lector). */
+@media (max-width: 559px) {
+  .anchos__texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.ventana__lienzo {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  min-height: clamp(420px, 68vh, 860px);
+  padding: var(--space-3);
+  background: var(--color-maqueta);
+}
+
+/* Cambiar de ancho es una respuesta a la acción: se anima, salvo con movimiento reducido. */
+.ventana__marco {
+  display: grid;
+  max-width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background: #ffffff;
+  transition: width var(--duracion-lenta) var(--easing-salida);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ventana__marco {
+    transition: none;
+  }
+}
+
+.ventana__iframe {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(400px, 66vh, 840px);
+  border: 0;
+  background: #ffffff;
+}
+
+.ventana__vacio {
+  align-self: center;
+  padding: var(--space-6);
+  color: #4b5263;
+  text-align: center;
+}
