@@ -1,0 +1,45 @@
+<div class="cabecera">
+  <h2 class="titulo">Versiones</h2>
+  <div class="controles">
+    <button
+      type="button"
+      class="control deshacer"
+      [disabled]="!puedeDeshacer()"
+      (click)="deshacer.emit()"
+    >
+      <ui-icon nombre="deshacer" /> Deshacer
+    </button>
+    <button
+      type="button"
+      class="control rehacer"
+      [disabled]="!puedeRehacer()"
+      (click)="rehacer.emit()"
+    >
+      <ui-icon nombre="rehacer" /> Rehacer
+    </button>
+  </div>
+</div>
+<ol class="lista">
+  @for (f of filas(); track f.id) {
+    <li class="version" [attr.aria-current]="f.id === actual() ? 'true' : null">
+      <button type="button" (click)="irA.emit(f.id)">
+        <span class="version__numero">{{ f.numero }}</span>
+        <span class="version__texto">
+          <span class="version__orden">«{{ f.orden }}»</span>
+          <span class="version__meta">
+            {{ f.hora }}
+            @if (f.rama) {
+              · desde la {{ f.rama }}
+            }
+            @if (f.id < 0) {
+              · sin guardar
+            }
+          </span>
+        </span>
+        @if (f.id === actual()) {
+          <span class="visually-hidden">(la que estás viendo)</span>
+        }
+      </button>
+    </li>
+  }
+</ol>

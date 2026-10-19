@@ -1,0 +1,121 @@
+:host {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.titulo {
+  font-size: var(--text-sm);
+  font-weight: var(--peso-fuerte);
+  color: var(--color-texto-suave);
+}
+
+.controles {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--color-borde);
+  color: var(--color-texto);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--peso-fuerte);
+  cursor: pointer;
+}
+
+.control:disabled {
+  border: 1px dashed var(--color-borde);
+  box-shadow: none;
+  color: var(--color-texto-suave);
+  cursor: not-allowed;
+}
+
+.control:focus-visible,
+.version button:focus-visible {
+  outline: 2px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+.lista {
+  display: grid;
+  gap: var(--space-1);
+  max-height: 22rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+/* Una línea de tiempo: cada versión es un punto numerado sobre una línea vertical. */
+.version button {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  align-items: start;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .version button:hover {
+    background: var(--color-fondo);
+  }
+}
+
+.version__numero {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--color-borde);
+  border-radius: 50%;
+  font-size: var(--text-sm);
+  font-weight: var(--peso-fuerte);
+}
+
+.version[aria-current='true'] .version__numero {
+  border-color: var(--color-primario);
+  background: var(--color-primario);
+  color: var(--color-primario-contraste);
+}
+
+.version__texto {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.version__orden {
+  font-family: var(--font-voz);
+  font-size: var(--text-base);
+  overflow-wrap: anywhere;
+}
+
+.version__meta {
+  font-size: var(--text-xs);
+  color: var(--color-texto-suave);
+}
