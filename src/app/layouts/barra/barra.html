@@ -1,0 +1,35 @@
+<header class="barra">
+  <a class="marca" routerLink="/app">
+    <svg class="marca__logo" viewBox="0 0 30 24" aria-hidden="true" focusable="false">
+      <path class="marca__comillas" d="M3 9c0-3 2-5 4-5M3 9h3v4H3ZM10 9c0-3 2-5 4-5M10 9h3v4h-3Z" />
+      <rect class="marca__bloque" x="17" y="7" width="11" height="13" rx="2" />
+      <path class="marca__linea" d="M19.5 11h6M19.5 14.5h4" />
+    </svg>
+    {{ nombreApp }}
+  </a>
+
+  <div class="barra__acciones">
+    <a
+      class="barra__enlace"
+      routerLink="/proyectos"
+      routerLinkActive="barra__enlace--activo"
+      ariaCurrentWhenActive="page"
+      aria-label="Mis proyectos"
+    >
+      <ui-icon nombre="carpeta" />
+      <span class="solo-ancho">Mis proyectos</span>
+    </a>
+    <ui-theme-toggle />
+    <div class="perfil">
+      <ui-avatar class="perfil__avatar" [iniciales]="auth.iniciales()" />
+      <div class="perfil__texto">
+        <span class="perfil__nombre">{{ usuario()?.nombre }}</span>
+        <span class="perfil__correo">{{ usuario()?.email }}</span>
+      </div>
+    </div>
+    <ui-button variante="secundario" tamano="compacto" etiqueta="Cerrar sesión" (click)="salir()">
+      <ui-icon nombre="salir" />
+      <span class="solo-ancho">Cerrar sesión</span>
+    </ui-button>
+  </div>
+</header>

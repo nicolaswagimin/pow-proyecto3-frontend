@@ -1,0 +1,106 @@
+:host {
+  display: block;
+}
+
+/* ---------- Barra superior ---------- */
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) clamp(var(--space-4), 3vw, var(--space-8));
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  color: var(--color-texto);
+  font-weight: var(--peso-fuerte);
+  font-size: var(--text-lg);
+  text-decoration: none;
+}
+
+.marca__logo {
+  flex-shrink: 0;
+  width: 30px;
+  height: 24px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.marca__comillas {
+  stroke: var(--color-texto);
+  stroke-width: 1.8;
+}
+
+.marca__bloque {
+  fill: var(--color-primario);
+}
+
+.marca__linea {
+  stroke: var(--color-primario-contraste);
+  stroke-width: 1.6;
+}
+
+.barra__acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.perfil__texto {
+  display: grid;
+  min-width: 0;
+}
+
+.perfil__nombre {
+  font-weight: var(--peso-fuerte);
+}
+
+.perfil__correo {
+  font-size: var(--text-sm);
+  color: var(--color-texto-suave);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barra__enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-control);
+  color: var(--color-texto);
+  font-weight: var(--peso-fuerte);
+  text-decoration: none;
+}
+
+.barra__enlace--activo {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.barra__enlace:focus-visible {
+  outline: 2px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .perfil__texto,
+  .solo-ancho {
+    display: none;
+  }
+}
