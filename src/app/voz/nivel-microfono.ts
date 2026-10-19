@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 // El volumen real del micrófono con Web Audio (getUserMedia + AnalyserNode): alimenta la
 // visualización de la voz en /app. Si la animación se mueve, es porque el micrófono oye algo
@@ -25,6 +25,8 @@ interface Pista {
   stop(): void;
 }
 
+// Se provee en el componente que lo usa (y se reemplaza en las pruebas).
+@Injectable()
 export class NivelMicrofono {
   readonly nivel = signal(0);
   private stream: { getTracks(): Pista[] } | null = null;
