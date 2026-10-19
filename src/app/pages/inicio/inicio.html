@@ -1,205 +1,175 @@
 <div class="pagina">
-  <header class="barra">
-    <a class="marca" routerLink="/app">
-      <svg class="marca__logo" viewBox="0 0 30 24" aria-hidden="true" focusable="false">
-        <path
-          class="marca__comillas"
-          d="M3 9c0-3 2-5 4-5M3 9h3v4H3ZM10 9c0-3 2-5 4-5M10 9h3v4h-3Z"
+  <app-barra />
+
+  <!-- Lo que cambió, lo que se deshizo, si se guardó: se anuncia sin mover el foco. -->
+  <p class="anuncio visually-hidden" role="status">{{ estado.anuncio() }}</p>
+
+  @if (!enEstudio()) {
+    <!-- ---------- Estado vacío: el micrófono es el protagonista ---------- -->
+    <main class="escenario">
+      <h1 class="escenario__titulo">
+        @if (primerNombre()) {
+          <span class="escenario__saludo">Hola, {{ primerNombre() }}.</span>
+        }
+        ¿Qué página quieres crear?
+      </h1>
+      <p class="escenario__texto">
+        Pulsa el micrófono y descríbela en voz alta. La verás armarse en vivo y después podrás
+        cambiarla con nuevas órdenes.
+      </p>
+
+      @if (voz.disponible) {
+        <ui-microfono
+          [escuchando]="voz.escuchando()"
+          [nivel]="nivel()"
+          (pulsar)="estado.dictar()"
         />
-        <rect class="marca__bloque" x="17" y="7" width="11" height="13" rx="2" />
-        <path class="marca__linea" d="M19.5 11h6M19.5 14.5h4" />
-      </svg>
-      {{ nombreApp }}
-    </a>
+      }
 
-    <div class="barra__acciones">
-      <ui-theme-toggle />
-      <div class="perfil">
-        <ui-avatar class="perfil__avatar" [iniciales]="auth.iniciales()" />
-        <div class="perfil__texto">
-          <span class="perfil__nombre">{{ usuario()?.nombre }}</span>
-          <span class="perfil__correo">{{ usuario()?.email }}</span>
-        </div>
-      </div>
-      <ui-button variante="secundario" tamano="compacto" etiqueta="Cerrar sesión" (click)="salir()">
-        <ui-icon nombre="salir" />
-        <span class="solo-ancho">Cerrar sesión</span>
-      </ui-button>
-    </div>
-  </header>
+      @if (estado.errorVoz(); as e) {
+        <ui-alert tipo="aviso" class="error-voz">{{ e }}</ui-alert>
+      }
 
-  <div class="hoja">
-    <section class="guion" aria-label="Guion de esta sesión">
-      <ui-transcripcion
-        [lineas]="lineas()"
+      <ui-orden
+        class="escenario__orden"
+        [(texto)]="estado.orden"
+        [confirmado]="voz.confirmado()"
+        [interino]="voz.interino()"
         [escuchando]="voz.escuchando()"
-        [oyendoVoz]="voz.oyendoVoz()"
+        [disponible]="voz.disponible"
+        [idioma]="voz.idioma()"
+        [enviando]="!!estado.trabajando()"
+        etiquetaEnviar="Crear la página"
+        (enviar)="estado.enviar($event)"
+        (cambiarIdioma)="voz.cambiarIdioma($event)"
       />
-    </section>
 
-    <main class="contenido">
-      <section class="bienvenida">
-        <h1>Hola, {{ primerNombre() }}</h1>
-        <p class="bienvenida__texto">
-          Aquí vas a describir en voz alta la página que quieres y verla armarse. Por ahora, dicta o
-          escribe una pregunta para la IA.
-        </p>
-      </section>
+      @if (estado.error(); as e) {
+        <ui-alert tipo="error" class="error-ia">
+          {{ e.mensaje }}
+          @if (e.reintentar) {
+            <ui-button variante="secundario" tamano="compacto" (click)="estado.reintentar()">
+              <ui-icon nombre="recargar" /> Reintentar
+            </ui-button>
+          }
+        </ui-alert>
+      }
 
-      <!-- 1. IA: la parte que ya funciona por voz -->
-      <section class="panel" aria-labelledby="titulo-ia">
-        <h2 id="titulo-ia"><ui-icon nombre="chispa" class="titulo-icono" /> Pregúntale a la IA</h2>
-
-        <form class="formulario" [formGroup]="formIA" (ngSubmit)="preguntar()">
-          <ui-text-field
-            #campoPregunta
-            formControlName="pregunta"
-            label="Tu pregunta"
-            multilinea
-            [conAccion]="voz.disponible"
-          >
-            @if (voz.disponible) {
-              <button
-                campo-accion
-                type="button"
-                class="mic"
-                [class.mic--rec]="voz.escuchando()"
-                [attr.aria-pressed]="voz.escuchando()"
-                [attr.aria-label]="voz.escuchando() ? 'Dejar de dictar' : 'Dictar la pregunta'"
-                (pointerdown)="$event.preventDefault()"
-                (click)="dictarPregunta()"
-              >
-                <ui-icon nombre="microfono" />
+      <ui-ejemplos [frases]="estado.ejemplos" (elegir)="probar($event)" />
+    </main>
+  } @else {
+    <!-- ---------- Estudio: la ventana con la página y el mando ---------- -->
+    <main class="estudio">
+      <div class="estudio__cabecera">
+        <h1 class="estudio__titulo">{{ nombre() }}</h1>
+        @if (textoGuardado(); as g) {
+          <p class="guardado" [attr.data-estado]="estado.guardado()">
+            <ui-icon [nombre]="estado.guardado() === 'error' ? 'alerta' : 'check'" />
+            {{ g }}
+            @if (estado.guardado() === 'error') {
+              <button type="button" class="enlace" (click)="estado.guardarPendientes()">
+                Reintentar guardar
               </button>
             }
-          </ui-text-field>
-          <ui-button
-            tipo="submit"
-            [cargando]="pensando()"
-            textoCargando="Pensando…"
-            [deshabilitado]="formIA.invalid"
-          >
-            Preguntar
-          </ui-button>
-        </form>
+          </p>
+        }
+      </div>
 
-        @if (errorIA()) {
-          <ui-alert tipo="error">{{ errorIA() }}</ui-alert>
-        }
-        @if (respuesta()) {
-          <div class="respuesta" aria-live="polite">{{ respuesta() }}</div>
-        }
+      <section class="lienzo" aria-label="Vista previa">
+        <ui-ventana
+          [documento]="estado.documento()"
+          [nombre]="nombre()"
+          [(ancho)]="estado.ancho"
+          vacio="La página aparece aquí apenas llega el primer bloque."
+        >
+          @if (estado.trabajando()) {
+            <ui-construccion
+              class="lienzo__progreso"
+              [progreso]="estado.progreso()"
+              [orden]="estado.ordenEnCurso()"
+            />
+          }
+        </ui-ventana>
       </section>
 
-      <!-- 2. Estado de conexión -->
-      <section class="panel" aria-labelledby="titulo-estado">
-        <div class="panel__cabecera">
-          <h2 id="titulo-estado">Estado</h2>
+      <section class="mando" aria-labelledby="titulo-mando">
+        <h2 id="titulo-mando" class="mando__titulo">Siguiente orden</h2>
+        <div class="mando__voz">
+          @if (voz.disponible) {
+            <ui-microfono
+              compacto
+              [escuchando]="voz.escuchando()"
+              [nivel]="nivel()"
+              [deshabilitado]="!!estado.trabajando()"
+              (pulsar)="estado.dictar()"
+            />
+          }
+          <p class="mando__pista">
+            Di un cambio («cambia el título a azul», «agrega un formulario de contacto») o un
+            comando: «deshacer», «rehacer», «nueva página», «descargar».
+          </p>
+        </div>
+
+        @if (estado.errorVoz(); as e) {
+          <ui-alert tipo="aviso" class="error-voz">{{ e }}</ui-alert>
+        }
+
+        <ui-orden
+          [(texto)]="estado.orden"
+          [confirmado]="voz.confirmado()"
+          [interino]="voz.interino()"
+          [escuchando]="voz.escuchando()"
+          [disponible]="voz.disponible"
+          [idioma]="voz.idioma()"
+          [enviando]="!!estado.trabajando()"
+          etiquetaEnviar="Aplicar el cambio"
+          (enviar)="estado.enviar($event)"
+          (cambiarIdioma)="voz.cambiarIdioma($event)"
+        />
+
+        @if (estado.error(); as e) {
+          <ui-alert tipo="error" class="error-ia">
+            {{ e.mensaje }}
+            @if (e.reintentar) {
+              <ui-button variante="secundario" tamano="compacto" (click)="estado.reintentar()">
+                <ui-icon nombre="recargar" /> Reintentar
+              </ui-button>
+            }
+          </ui-alert>
+        }
+
+        <div class="acciones">
           <ui-button
-            variante="fantasma"
+            variante="secundario"
             tamano="compacto"
-            [cargando]="cargandoEstado()"
-            textoCargando="Revisando…"
-            (click)="revisarEstado()"
+            [deshabilitado]="!estado.actual()"
+            (click)="estado.descargar()"
           >
-            <ui-icon nombre="recargar" />
-            Revisar de nuevo
+            <ui-icon nombre="descargar" /> Descargar
+          </ui-button>
+          <ui-button
+            variante="secundario"
+            tamano="compacto"
+            [deshabilitado]="!estado.actual()"
+            (click)="estado.copiar()"
+          >
+            <ui-icon nombre="copiar" /> Copiar código
+          </ui-button>
+          <ui-button variante="fantasma" tamano="compacto" (click)="estado.nueva()">
+            <ui-icon nombre="mas" /> Nueva página
           </ui-button>
         </div>
 
-        <ul class="estado">
-          @for (punto of puntosEstado(); track punto.nombre) {
-            <li [class]="'estado__punto estado__punto--' + punto.estado">
-              <ui-icon
-                [nombre]="
-                  punto.estado === 'ok'
-                    ? 'check'
-                    : punto.estado === 'revisando'
-                      ? 'recargar'
-                      : 'alerta'
-                "
-              />
-              <span class="estado__nombre">{{ punto.nombre }}</span>
-              <span class="estado__resultado">{{ punto.resultado }}</span>
-            </li>
-          }
-        </ul>
-
-        @if (!cargandoEstado()) {
-          @if (!estado()) {
-            <ui-alert tipo="error" titulo="No hay conexión con el backend.">
-              Revisa que el backend esté corriendo (<code>npm run dev</code> en la carpeta
-              <code>backend</code>) y que responda en <code>{{ apiUrl }}</code
-              >. En producción, revisa también que <code>FRONTEND_URL</code> del backend incluya la
-              URL de este sitio (CORS).
-            </ui-alert>
-          } @else {
-            @if (!estado()!.db) {
-              <ui-alert tipo="aviso">
-                La base de datos no responde: revisa <code>DATABASE_URL</code> (y
-                <code>DB_SSL</code>) en el <code>.env</code> del backend.
-              </ui-alert>
-            }
-            @if (!estado()!.ia) {
-              <ui-alert tipo="aviso">
-                La IA no está configurada: agrega <code>GEMINI_API_KEY</code> en el
-                <code>.env</code> del backend.
-              </ui-alert>
-            }
-          }
-        }
-      </section>
-
-      <!-- 3. Registros -->
-      <section class="panel" aria-labelledby="titulo-registros">
-        <h2 id="titulo-registros">Tus registros</h2>
-
-        <form class="formulario" [formGroup]="formItem" (ngSubmit)="crear()">
-          <ui-text-field formControlName="titulo" label="Título" [maxlength]="200" />
-          <ui-text-field formControlName="descripcion" label="Descripción" multilinea opcional />
-          <ui-button
-            tipo="submit"
-            [cargando]="guardando()"
-            textoCargando="Guardando…"
-            [deshabilitado]="formItem.invalid"
-          >
-            <ui-icon nombre="mas" />
-            Crear
-          </ui-button>
-        </form>
-
-        @if (errorItems()) {
-          <ui-alert tipo="error">{{ errorItems() }}</ui-alert>
-        }
-
-        <ul class="lista" aria-live="polite">
-          @for (item of items(); track item.id) {
-            <li class="lista__item" animate.enter="item-entra" animate.leave="item-sale">
-              <div class="lista__texto">
-                <h3>{{ item.titulo }}</h3>
-                @if (item.descripcion) {
-                  <p>{{ item.descripcion }}</p>
-                }
-                <small>{{ item.creado_en | date: 'short' }}</small>
-              </div>
-              <ui-button
-                variante="peligro"
-                tamano="compacto"
-                [etiqueta]="'Eliminar ' + item.titulo"
-                (click)="eliminar(item)"
-              >
-                <ui-icon nombre="papelera" />
-              </ui-button>
-            </li>
-          } @empty {
-            @if (!cargandoItems()) {
-              <li class="vacio">
-                Todavía no tienes registros. Crea el primero con el formulario de arriba.
-              </li>
-            }
-          }
-        </ul>
+        <ui-linea-tiempo
+          [versiones]="estado.versiones()"
+          [actual]="estado.actualId()"
+          [puedeDeshacer]="estado.puedeDeshacer()"
+          [puedeRehacer]="estado.puedeRehacer()"
+          (irA)="estado.irA($event)"
+          (deshacer)="estado.deshacer()"
+          (rehacer)="estado.rehacer()"
+        />
       </section>
     </main>
-  </div>
+  }
 </div>
