@@ -45,6 +45,65 @@ Clase (no inyectable) que guarda las líneas del guion y qué bloques están ens
 
 Lo dicho va en Newsreader entre comillas angulares; lo interino, en gris e itálica; las respuestas de la app, en la letra de la interfaz. Quién habla solo se repite cuando cambia. En pantallas angostas muestra las dos últimas frases.
 
+## El estudio (`app/estudio/componentes/`, `app/vista-previa/`)
+
+### `ui-microfono`
+
+| Input / output | Tipo | Descripción |
+|---|---|---|
+| `escuchando` | `boolean` | Pasa a REC y muestra los anillos |
+| `nivel` | `number` (0 a 1) | Volumen real del micrófono (`NivelMicrofono`); escala los anillos con `--nivel` |
+| `compacto` | `boolean` | 72 px, en el mando; si no, de 96 a 132 px |
+| `deshabilitado` | `boolean` | Mientras la IA trabaja |
+| `pulsar` (output) | `void` | Clic |
+
+`aria-pressed` y `aria-label` («Dictar una orden» o «Dejar de escuchar»). Los anillos y el vúmetro (para movimiento reducido) son `aria-hidden`.
+
+### `ui-orden`
+
+| Input / output | Tipo | Descripción |
+|---|---|---|
+| `texto` (model) | `string` | La orden, editable |
+| `confirmado`, `interino` | `string` | Lo que se está dictando: en tinta y en gris e itálica |
+| `escuchando`, `disponible` | `boolean` | Sin Web Speech API muestra el aviso de teclado y oculta el selector de variante |
+| `idioma` | `string` | Variante del español elegida |
+| `enviando`, `etiquetaEnviar` | `boolean`, `string` | «Crear la página» o «Aplicar el cambio» |
+| `enviar` (output) | `string` | Enter o el botón (Mayús + Enter es salto de línea) |
+| `cambiarIdioma` (output) | `string` | El código de la variante |
+
+### `ui-ejemplos`
+
+`frases: string[]` → `elegir` (output) con la frase. Botones en Newsreader, entre comillas.
+
+### `ui-construccion`
+
+`progreso: Progreso` (texto, bloques que llegaron, caracteres, `sinStream`, `desdeCache`) y `orden`. Solo el texto de estado es `role="status"`.
+
+### `ui-linea-tiempo`
+
+| Input / output | Tipo | Descripción |
+|---|---|---|
+| `versiones`, `actual` | `Version[]`, `number \| null` | La actual con `aria-current` |
+| `puedeDeshacer`, `puedeRehacer` | `boolean` | Deshabilitados con borde discontinuo |
+| `irA`, `deshacer`, `rehacer` (outputs) | `number`, `void`, `void` | |
+
+Muestra el número, la orden, la hora, «desde la N» en una rama y «sin guardar».
+
+### `ui-ventana`
+
+| Input / output | Tipo | Descripción |
+|---|---|---|
+| `documento` | `string \| null` | Un documento de `documentoVistaPrevia()` (saneado y con CSP) |
+| `nombre` | `string` | En la barra y en el título del iframe |
+| `vacio` | `string` | Texto del lienzo sin documento |
+| `ancho` (model) | `'movil' \| 'tablet' \| 'escritorio'` | 375 px, 768 px o 100 % |
+
+Iframe con `sandbox=""`. Contenido proyectado: el progreso que flota encima.
+
+### `app-barra`
+
+La barra de `/app` y `/proyectos`: marca, «Mis proyectos», tema, usuario y cerrar sesión.
+
 ## Base (`app/ui/`)
 
 ### `ui-button`
