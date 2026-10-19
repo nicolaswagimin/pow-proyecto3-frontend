@@ -77,6 +77,8 @@ En escritorio el guion va a la izquierda, como el texto de un apuntador. En móv
 
 ### Extensión a `/app`
 
+> **Actualizado el 2026-10-19:** `/app` es ahora el estudio, rediseñado alrededor del micrófono y la ventana de navegador ([funcionalidades.md](funcionalidades.md)). Lo que sigue describe la versión anterior.
+
 `/app` usa la misma hoja: a la izquierda, el guion de la sesión; a la derecha, el contenido. "Pregúntale a la IA" sube al primer lugar y suma un micrófono para **dictar la pregunta**: es la primera parte del producto que ya funciona por voz. El estado del sistema se lee con ícono y resultado en texto. Un registro nuevo se ensambla desde un bloque de maqueta.
 
 ## Revisión contra lo genérico
