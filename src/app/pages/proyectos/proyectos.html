@@ -1,0 +1,97 @@
+<app-barra />
+<main class="hoja">
+  <h1>Mis proyectos</h1>
+  <p class="anuncio visually-hidden" role="status">{{ anuncio() }}</p>
+
+  @if (error(); as e) {
+    <ui-alert tipo="error">{{ e }}</ui-alert>
+  }
+
+  @if (lista(); as proyectos) {
+    @if (proyectos.length) {
+      <ul class="lista">
+        @for (p of proyectos; track p.id) {
+          <li class="proyecto">
+            @if (renombrando() === p.id) {
+              <form class="renombre" (submit)="guardarNombre($event, p)">
+                <label class="visually-hidden" [for]="'nombre-' + p.id">Nombre del proyecto</label>
+                <input
+                  class="campo"
+                  [id]="'nombre-' + p.id"
+                  maxlength="120"
+                  [value]="nombreNuevo"
+                  (input)="alEscribir($event)"
+                />
+                <button type="submit" class="boton">Guardar</button>
+                <button type="button" class="boton boton--suave" (click)="renombrando.set(null)">
+                  Cancelar
+                </button>
+              </form>
+            } @else {
+              <a class="proyecto__abrir" [routerLink]="['/app']" [queryParams]="{ proyecto: p.id }">
+                <span class="proyecto__nombre">{{ p.nombre }}</span>
+                <span class="proyecto__meta">
+                  {{ p.versiones }} {{ p.versiones === 1 ? 'versión' : 'versiones' }} ·
+                  {{ cuando(p.actualizado_en) }}
+                </span>
+                @if (p.ultima_orden) {
+                  <span class="proyecto__orden">Última orden: «{{ p.ultima_orden }}»</span>
+                }
+              </a>
+            }
+
+            @if (borrando() === p.id) {
+              <div
+                class="confirmar"
+                role="group"
+                [attr.aria-label]="'Confirmar borrar ' + p.nombre"
+              >
+                <p>¿Borrar «{{ p.nombre }}» y todas sus versiones? No se puede deshacer.</p>
+                <button
+                  type="button"
+                  class="boton boton--peligro confirmar__si"
+                  (click)="borrar(p)"
+                >
+                  Sí, borrar
+                </button>
+                <button type="button" class="boton boton--suave" (click)="borrando.set(null)">
+                  Cancelar
+                </button>
+              </div>
+            } @else if (renombrando() !== p.id) {
+              <div class="proyecto__acciones">
+                <button
+                  type="button"
+                  class="boton boton--suave renombrar"
+                  (click)="empezarRenombre(p)"
+                >
+                  Renombrar<span class="visually-hidden"> {{ p.nombre }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="boton boton--suave borrar"
+                  (click)="borrando.set(p.id)"
+                >
+                  <ui-icon nombre="papelera" /> Borrar<span class="visually-hidden">
+                    {{ p.nombre }}</span
+                  >
+                </button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="vacio">
+        <p>
+          Todavía no tienes proyectos. Cada página que crees se guarda aquí con todas sus versiones.
+        </p>
+        <a class="boton" routerLink="/app"
+          ><ui-icon nombre="microfono" /> Crear mi primera página</a
+        >
+      </div>
+    }
+  } @else if (!error()) {
+    <p class="cargando">Cargando tus proyectos…</p>
+  }
+</main>
