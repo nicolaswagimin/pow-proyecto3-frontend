@@ -17,6 +17,17 @@ Objetivo: WCAG 2.2 AA en todas las pantallas, en claro y oscuro, en escritorio y
 - La transcripción no es `aria-live`. Si lo fuera, un lector de pantalla leería cada palabra del guion mientras la persona intenta llenar el formulario. Está en una `section` con nombre ("Lo que se dictó") para leerla cuando se quiera.
 - Con movimiento reducido o la pestaña oculta, no hay reproducción: todo aparece listo.
 
+### El estudio (`/app`)
+- **Un solo `h1`** por estado: «¿Qué página quieres crear?» antes de la primera página y el nombre del proyecto después. El mando es una `section` con su `h2` («Siguiente orden») y la ventana, una `section` con nombre («Vista previa»).
+- **El micrófono** es un botón con `aria-pressed` y `aria-label` («Dictar una orden» o «Dejar de escuchar»), de 96 px o más (72 px en el mando). Los anillos y el vúmetro son `aria-hidden`.
+- **La transcripción en vivo no es `aria-live`:** lo dicho termina en el campo «Tu orden», que tiene su etiqueta y su ayuda (`aria-describedby`). Enter envía y Mayús + Enter hace un salto de línea.
+- **Los anuncios** (qué cambió, deshacer, rehacer, guardado, copiado) van en una región `role="status"` que no mueve el foco. El progreso de la construcción anuncia solo su texto de estado, no cada carácter.
+- **Los errores** van en `ui-alert` con su acción («Reintentar»). Lo escrito nunca se borra.
+- **La vista previa** tiene título («Vista previa de <proyecto>»). Los anchos son botones con `aria-pressed` y nombre; en móvil queda solo el ícono, pero el nombre sigue disponible para el lector.
+- **La línea de tiempo** marca la versión actual con `aria-current`. Deshacer y Rehacer deshabilitados llevan borde discontinuo, no solo color.
+- **`/proyectos`:** cada proyecto es un enlace con su nombre. Renombrar y borrar dicen a qué proyecto se refieren (texto oculto), y borrar pide confirmación en línea, sin diálogo modal.
+- **Movimiento:** los anillos, la entrada de bloques, el contorno de los cambios y el cambio de ancho se desactivan con `prefers-reduced-motion`.
+
 ### Formularios
 - Labels visibles arriba. `aria-required="true"` en los campos obligatorios.
 - `autocomplete`: `email`, `current-password`, `new-password`, `name`. `type="email"` con `inputmode="email"`.
@@ -40,7 +51,25 @@ Objetivo: WCAG 2.2 AA en todas las pantallas, en claro y oscuro, en escritorio y
 
 ## Verificación
 
-Fecha: 2026-10-12. Herramientas: axe-core 4.14 (reglas `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa` y `best-practice`) con Playwright sobre Chrome, más pruebas de teclado, de movimiento reducido, con el backend apagado y con una Web Speech API simulada.
+### 2026-10-19 · El estudio, `/proyectos` y la vista previa
+
+axe-core 4.14 (reglas `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` y `wcag22aa`) con Playwright sobre Chrome, en 1440 y 390 px, claro y oscuro: **28 de 28 auditorías con 0 violaciones**.
+
+| Vista | Claro 1440 px | Claro 390 px | Oscuro 1440 px | Oscuro 390 px |
+|---|---|---|---|---|
+| `/login` | 0 violaciones | 0 | 0 | 0 |
+| `/registro` | 0 | 0 | 0 | 0 |
+| `/design` | 0 | 0 | 0 | 0 |
+| `/app` vacío | 0 | 0 | 0 | 0 |
+| `/app` dictando (REC y transcripción en vivo) | 0 | 0 | 0 | 0 |
+| `/proyectos` | 0 | 0 | 0 | 0 |
+| `/app` estudio (ventana, mando y versiones) | 0 | 0 | 0 | 0 |
+
+El contenido del iframe es la página generada por la IA (contenido de la persona, no de la app), así que se excluye de la auditoría de la app. El prompt le pide a Gemini que sea accesible.
+
+### 2026-10-12 · Identidad y acceso
+
+Herramientas: axe-core 4.14 (reglas `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa` y `best-practice`) con Playwright sobre Chrome, más pruebas de teclado, de movimiento reducido, con el backend apagado y con una Web Speech API simulada.
 
 | Ruta | Claro 1440 px | Claro 390 px | Oscuro 1440 px | Oscuro 390 px |
 |---|---|---|---|---|
