@@ -22,6 +22,15 @@ describe('ui-ventana', () => {
     expect(iframe.title).toBe('Vista previa de Café Pasto');
   });
 
+  it('el documento llega entero al iframe: head, estilos, CSP y data-vtw (Angular no lo re-sanea)', () => {
+    const documento =
+      '<!DOCTYPE html><html><head><meta http-equiv="Content-Security-Policy" content="default-src \'none\'"><style>h1{color:navy}</style></head><body><header data-vtw="encabezado"><h1>x</h1></header></body></html>';
+    const srcdoc = montar({ documento }).raiz.querySelector('iframe')!.getAttribute('srcdoc')!;
+    expect(srcdoc).toContain('<style>h1{color:navy}</style>');
+    expect(srcdoc).toContain('data-vtw="encabezado"');
+    expect(srcdoc).toContain('Content-Security-Policy');
+  });
+
   it('la barra lleva el nombre del proyecto', () => {
     expect(montar().raiz.querySelector('.ventana__nombre')?.textContent?.trim()).toBe('Café Pasto');
   });

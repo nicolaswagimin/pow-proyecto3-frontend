@@ -13,11 +13,11 @@
   </div>
   <div class="ventana__lienzo">
     <div class="ventana__marco" [style.width]="anchoPx() ? anchoPx() + 'px' : '100%'">
-      @if (documento(); as doc) {
+      @if (srcdoc(); as doc) {
         <iframe
           class="ventana__iframe"
           sandbox=""
-          [attr.srcdoc]="doc"
+          [srcdoc]="doc"
           [title]="'Vista previa de ' + nombre()"
         ></iframe>
       } @else {
