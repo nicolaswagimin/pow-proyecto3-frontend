@@ -107,7 +107,7 @@ export function documentoVistaPrevia(html: string, opciones: OpcionesVista = {})
   doc.head.prepend(csp);
   // La vista previa no navega: sin allow-top-navigation no saldría de la pestaña, pero un enlace
   // cargaría otra página dentro del marco. Solo quedan las anclas internas.
-  doc.querySelectorAll('[href]').forEach((el) => {
+  doc.querySelectorAll('a[href], area[href]').forEach((el) => {
     const href = el.getAttribute('href') ?? '';
     if (!href.startsWith('#')) el.setAttribute('href', '#');
   });
