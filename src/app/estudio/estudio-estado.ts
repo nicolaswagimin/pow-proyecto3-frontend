@@ -120,6 +120,8 @@ export class EstudioEstado {
   private ultima: string | null = null; // la última orden enviada, para "Reintentar"
   private temporal = 0; // ids negativos de las versiones aún sin guardar
   private generacion = 0; // sube con "nueva página": descarta lo que llegue de la anterior
+  private peticion: AbortController | null = null; // la orden en curso, para cortarla con "nueva"
+  private cola: Promise<void> = Promise.resolve(); // los guardados de esta página, uno tras otro
 
   // ---------- Órdenes ----------
 
@@ -151,6 +153,8 @@ export class EstudioEstado {
     const base = this.actual();
     const modo = base ? 'editar' : 'generar';
     const generacion = this.generacion;
+    const peticion = new AbortController();
+    this.peticion = peticion;
     this.error.set(null);
     this.trabajando.set(modo);
     this.ordenEnCurso.set(orden);
@@ -205,8 +209,8 @@ export class EstudioEstado {
     try {
       const pagina =
         modo === 'editar'
-          ? await this.paginas.editar(base!.html, orden, alEvento)
-          : await this.paginas.generar(orden, alEvento);
+          ? await this.paginas.editar(base!.html, orden, alEvento, peticion.signal)
+          : await this.paginas.generar(orden, alEvento, peticion.signal);
       if (generacion !== this.generacion) return;
       if (!base && (pagina.desdeCache || this.progreso().sinStream)) await this.revelar(pagina);
       this.enConstruccion.set(null);
@@ -223,6 +227,7 @@ export class EstudioEstado {
         reintentar: estado === 0 || estado >= 500,
       });
     } finally {
+      if (this.peticion === peticion) this.peticion = null;
       if (generacion === this.generacion) {
         this.trabajando.set(null);
         this.ordenEnCurso.set('');
@@ -276,9 +281,22 @@ export class EstudioEstado {
 
   private nombrePendiente = '';
 
-  // Guarda en orden las versiones que aún no están en el servidor (ids negativos).
-  async guardarPendientes(): Promise<void> {
-    if (!this.versiones().some((v) => v.id < 0)) return;
+  private hayPendientes(): boolean {
+    return this.versiones().some((v) => v.id < 0);
+  }
+
+  // Guarda en orden las versiones que aún no están en el servidor (ids negativos). Los guardados
+  // van en cola: "Reintentar guardar" durante el guardado de una orden no duplica nada.
+  guardarPendientes(): Promise<void> {
+    const generacion = this.generacion;
+    this.cola = this.cola.then(() => this.guardarUnaPasada(generacion));
+    return this.cola;
+  }
+
+  // Después de cada espera se comprueba que siga siendo la misma página: si se pidió una nueva o
+  // se abrió otro proyecto, lo que responda el servidor ya no se mezcla con el estado actual.
+  private async guardarUnaPasada(generacion: number): Promise<void> {
+    if (generacion !== this.generacion || !this.hayPendientes()) return;
     this.guardado.set('guardando');
     try {
       for (const v of this.versiones().filter((x) => x.id < 0)) {
@@ -292,6 +310,7 @@ export class EstudioEstado {
               html: actual.html,
             }),
           );
+          if (generacion !== this.generacion) return;
           this.proyecto.set({ id: p.id, nombre: p.nombre });
           guardada = p.versiones[0];
         } else {
@@ -303,12 +322,13 @@ export class EstudioEstado {
               html: actual.html,
             }),
           );
+          if (generacion !== this.generacion) return;
         }
         this.reemplazarId(v.id, guardada.id);
       }
       this.guardado.set('guardado');
     } catch {
-      this.guardado.set('error');
+      if (generacion === this.generacion) this.guardado.set('error');
     }
   }
 
@@ -381,8 +401,25 @@ export class EstudioEstado {
 
   // ---------- Proyecto ----------
 
-  nueva(): void {
+  // Se puede reemplazar en las pruebas.
+  confirmar(mensaje: string): boolean {
+    return typeof confirm !== 'function' || confirm(mensaje);
+  }
+
+  // Devuelve false si la persona prefirió no descartar versiones sin guardar.
+  nueva(): boolean {
+    if (
+      this.hayPendientes() &&
+      !this.confirmar(
+        'Hay versiones sin guardar en el servidor. Si sigues, se pierden. ¿Quieres continuar?',
+      )
+    ) {
+      return false;
+    }
     this.generacion++;
+    this.peticion?.abort();
+    this.peticion = null;
+    this.cola = Promise.resolve();
     this.proyecto.set(null);
     this.versiones.set([]);
     this.actualId.set(null);
@@ -396,14 +433,17 @@ export class EstudioEstado {
     this.nombrePendiente = '';
     this.fase.set('vacio');
     this.anuncio.set('Página nueva: dime qué quieres crear.');
+    return true;
   }
 
   async cargar(id: number): Promise<void> {
-    this.nueva();
+    if (!this.nueva()) return;
+    const generacion = this.generacion;
     this.fase.set('pensando');
     this.progreso.set({ ...PROGRESO_VACIO, texto: 'Abriendo el proyecto…' });
     try {
       const p = await firstValueFrom(this.proyectos.obtener(id));
+      if (generacion !== this.generacion) return;
       this.proyecto.set({ id: p.id, nombre: p.nombre });
       this.versiones.set(p.versiones);
       const ultima = p.versiones.at(-1);
@@ -414,6 +454,7 @@ export class EstudioEstado {
         `Abriste «${p.nombre}», con ${p.versiones.length} ${p.versiones.length === 1 ? 'versión' : 'versiones'}.`,
       );
     } catch {
+      if (generacion !== this.generacion) return;
       this.fase.set('vacio');
       this.error.set({
         mensaje: 'No se pudo abrir el proyecto. Puede que ya no exista.',

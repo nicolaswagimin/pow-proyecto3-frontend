@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 import {
   ErrorPagina,
   EventoPagina,
@@ -301,6 +301,85 @@ describe('EstudioEstado', () => {
     await estado.guardarPendientes();
     expect(estado.guardado()).toBe('guardado');
     expect(estado.versiones()[0].id).toBe(501);
+  });
+
+  it('guardar dos veces a la vez no duplica el proyecto ni las versiones', async () => {
+    const proyectos = proyectosFalsos({ fallar: true });
+    const { estado } = preparar({ proyectos });
+    estado.orden.set('x');
+    await estado.enviar();
+    const respuesta = new Subject<unknown>();
+    proyectos.servicio.crear.mockImplementation(() => respuesta as never);
+    const primero = estado.guardarPendientes();
+    const segundo = estado.guardarPendientes();
+    await Promise.resolve();
+    respuesta.next({
+      id: 1,
+      nombre: 'x',
+      creado_en: '',
+      actualizado_en: '',
+      versiones: [{ id: 501, base_id: null }],
+    });
+    await Promise.all([primero, segundo]);
+    expect(proyectos.servicio.crear).toHaveBeenCalledTimes(2); // el fallido y uno solo después
+    expect(proyectos.servicio.agregarVersion).not.toHaveBeenCalled();
+    expect(estado.versiones().map((v) => v.id)).toEqual([501]);
+  });
+
+  it('nueva página mientras se guarda: lo que llega del guardado viejo no entra en la nueva', async () => {
+    const proyectos = proyectosFalsos();
+    const respuesta = new Subject<unknown>();
+    proyectos.servicio.crear.mockImplementation(() => respuesta as never);
+    const { estado } = preparar({ proyectos });
+    estado.confirmar = () => true;
+    estado.orden.set('x');
+    const enviando = estado.enviar();
+    await vi.waitFor(() => expect(proyectos.servicio.crear).toHaveBeenCalled());
+    expect(estado.nueva()).toBe(true);
+    respuesta.next({
+      id: 1,
+      nombre: 'x',
+      creado_en: '',
+      actualizado_en: '',
+      versiones: [{ id: 501, base_id: null }],
+    });
+    await enviando;
+    expect(estado.proyecto()).toBeNull();
+    expect(estado.versiones()).toEqual([]);
+    expect(estado.guardado()).toBeNull();
+  });
+
+  it('nueva página con versiones sin guardar pide confirmación y, si no, no borra nada', async () => {
+    const { estado } = preparar({ proyectos: proyectosFalsos({ fallar: true }) });
+    estado.orden.set('x');
+    await estado.enviar();
+    const preguntas: string[] = [];
+    estado.confirmar = (m: string) => (preguntas.push(m), false);
+    expect(estado.nueva()).toBe(false);
+    expect(preguntas[0]).toMatch(/sin guardar/);
+    expect(estado.versiones()).toHaveLength(1);
+    await estado.cargar(1);
+    expect(estado.versiones()[0].id).toBeLessThan(0);
+  });
+
+  it('nueva página aborta la petición a la IA que estaba en curso', async () => {
+    let senal: AbortSignal | undefined;
+    const ia = {
+      llamadas: [],
+      servicio: {
+        generar: vi.fn((_o: string, _e: unknown, s?: AbortSignal) => {
+          senal = s;
+          return new Promise(() => {});
+        }),
+        editar: vi.fn(),
+      },
+    };
+    const { estado } = preparar({ ia: ia as never });
+    estado.orden.set('x');
+    void estado.enviar();
+    expect(senal?.aborted).toBe(false);
+    estado.nueva();
+    expect(senal?.aborted).toBe(true);
   });
 
   it('la vista en construcción muestra solo los bloques que ya llegaron', async () => {
