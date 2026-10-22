@@ -24,6 +24,8 @@ describe('versiones en árbol', () => {
     expect(rehacer(lista, 2)).toBe(4);
     expect(rehacer(lista, 1)).toBe(2);
     expect(rehacer(lista, 4)).toBeNull();
+    // Sin guardar, los ids son negativos y cada vez menores: cuenta el orden de la lista.
+    expect(rehacer([v(1, null), v(-1, 1), v(-2, 1)], 1)).toBe(-2);
   });
 
   it('puedeDeshacer y puedeRehacer', () => {

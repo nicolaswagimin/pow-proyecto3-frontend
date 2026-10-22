@@ -16,10 +16,11 @@ export function deshacer(versiones: Version[], actual: number): number | null {
   return versiones.find((v) => v.id === actual)?.base_id ?? null;
 }
 
-// Rehacer: la versión más reciente que salió de la actual (la última rama que se siguió).
+// Rehacer: la versión más reciente que salió de la actual (la última rama que se siguió). La lista
+// está en orden de creación; los ids no sirven para eso porque los no guardados son negativos.
 export function rehacer(versiones: Version[], actual: number): number | null {
   const hijas = versiones.filter((v) => v.base_id === actual);
-  return hijas.length ? Math.max(...hijas.map((v) => v.id)) : null;
+  return hijas.at(-1)?.id ?? null;
 }
 
 export const puedeDeshacer = (versiones: Version[], actual: number) =>
