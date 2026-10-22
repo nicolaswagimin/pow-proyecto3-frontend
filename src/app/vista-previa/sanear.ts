@@ -11,8 +11,10 @@ export const CSP_VISTA = [
   'img-src https: data:',
 ].join('; ');
 
+// template se quita entero: querySelectorAll no entra en su contenido y, con shadowrootmode, el
+// navegador lo adjunta como shadow DOM al abrir el archivo descargado.
 const ELEMENTOS_PELIGROSOS =
-  'script, noscript, iframe, frame, frameset, object, embed, applet, base, meta[http-equiv], portal';
+  'script, noscript, template, iframe, frame, frameset, object, embed, applet, base, meta[http-equiv], portal';
 const ATRIBUTOS_URL = [
   'href',
   'src',

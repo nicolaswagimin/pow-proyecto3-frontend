@@ -37,6 +37,16 @@ describe('sanear', () => {
     });
   }
 
+  it('quita <template>: querySelectorAll no entra en su contenido (shadow DOM declarativo)', () => {
+    const limpio = sanear(
+      pagina(
+        '<div><template shadowrootmode="open"><img src=x onerror="alert(1)"><script>alert(2)</script></template></div><p>hola</p>',
+      ),
+    );
+    expect(limpio).not.toMatch(/<template|onerror|<script/i);
+    expect(limpio).toContain('<p>hola</p>');
+  });
+
   it('quita meta refresh y base (podrían navegar o cambiar las rutas)', () => {
     const doc = parsear(
       sanear(
