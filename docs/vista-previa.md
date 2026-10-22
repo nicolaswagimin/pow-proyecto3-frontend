@@ -8,7 +8,7 @@ Código: `vista-previa/sanear.ts` (saneado y documento) y `vista-previa/ventana.
 
 Parsea con `DOMParser`, que no ejecuta nada, y quita:
 
-- **Elementos:** `script` (también en SVG), `noscript`, `iframe`, `frame`, `frameset`, `object`, `embed`, `applet`, `base`, `portal` y todo `meta[http-equiv]` (meta refresh incluido).
+- **Elementos:** `script` (también en SVG), `noscript`, `template` (su contenido no lo recorre `querySelectorAll` y, con `shadowrootmode`, el navegador lo adjunta como shadow DOM al abrir el archivo descargado), `iframe`, `frame`, `frameset`, `object`, `embed`, `applet`, `base`, `portal` y todo `meta[http-equiv]` (meta refresh incluido).
 - **Atributos:** `on*`, `srcdoc` y `formaction`, más las URLs `javascript:` en `href`, `src`, `action`, `xlink:href`, `data`, `poster` y `srcset` (también con espacios, tabuladores o saltos de línea dentro del esquema).
 - **Hojas externas:** solo quedan los `<link rel="stylesheet">` de `fonts.googleapis.com`. Se quitan los demás `<link>`, incluidos `prefetch` y `preload`.
 - **CSS que ejecuta o carga código** (`expression(`, `javascript:`, `-moz-binding`, `behavior:`), en `<style>` y en atributos `style`.

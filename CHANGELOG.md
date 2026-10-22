@@ -22,7 +22,7 @@ El estudio de VoiceToWeb: dictar una página, verla armarse en vivo y cambiarla 
 - **Descargar y copiar:** el HTML saneado.
 - **Errores claros y amables:** micrófono denegado, sin micrófono, sin conexión, cuota, respuesta inválida (con «Reintentar») y sesión.
 - **Barra compartida** con «Mis proyectos», e íconos nuevos.
-- **107 pruebas** con Vitest y jsdom (`npm test`).
+- **114 pruebas** con Vitest y jsdom (`npm test`).
 - **Documentación:**
   - nuevos: `funcionalidades.md`, `voz.md`, `vista-previa.md`, `versiones.md` y las ADR 0005 a 0008;
   - actualizados: `arquitectura-frontend.md`, `accesibilidad.md` (28 de 28 auditorías sin violaciones), la ADR 0004 y las capturas.
@@ -34,6 +34,10 @@ El estudio de VoiceToWeb: dictar una página, verla armarse en vivo y cambiarla 
 - `services/api.service.ts` (items y la pregunta genérica a la IA) y la vieja pantalla de `/app`.
 
 ### Corregido
+- `<template>` (shadow DOM declarativo) se saltaba el saneado del HTML descargado o copiado.
+- Guardar dos veces a la vez podía duplicar el proyecto, y «Nueva página» durante un guardado metía la página nueva en el proyecto anterior. Ahora los guardados van en cola, la orden en curso se corta y se pide confirmación antes de descartar versiones sin guardar.
+- El micrófono podía quedar abierto si el permiso llegaba después de terminar el dictado.
+- Rehacer elegía la rama más vieja cuando había versiones sin guardar.
 - Angular saneaba `srcdoc` por su cuenta y la página se veía sin estilos.
 - Las hojas de Google Fonts se neutralizaban junto con los enlaces.
 

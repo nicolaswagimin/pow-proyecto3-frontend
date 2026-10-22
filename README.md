@@ -52,7 +52,7 @@ El puerto está fijo en `angular.json`, así los tres proyectos pueden correr a 
 Las pruebas:
 
 ```bash
-npm test           # 107 pruebas con Vitest y jsdom
+npm test           # 114 pruebas con Vitest y jsdom
 ```
 
 Para compilar la versión de producción:

@@ -21,7 +21,7 @@ Un comando dictado se ejecuta enseguida. Escrito y enviado, también.
 
 ## Visualización: Web Audio (`voz/nivel-microfono.ts`)
 
-`NivelMicrofono` abre el micrófono con `getUserMedia({ audio: { echoCancellation, noiseSuppression } })`, lo conecta a un `AnalyserNode` (`fftSize` 1024) y en cada `requestAnimationFrame` calcula el **RMS** de la señal, escalado de 0 a 1. Sube rápido y baja despacio, como un vúmetro. El valor es una signal que mueve los anillos del micrófono.
+`NivelMicrofono` abre el micrófono con `getUserMedia({ audio: { echoCancellation, noiseSuppression } })`, lo conecta a un `AnalyserNode` (`fftSize` 1024) y en cada `requestAnimationFrame` calcula el **RMS** de la señal, escalado de 0 a 1. Sube rápido y baja despacio, como un vúmetro. El valor es una signal que mueve los anillos del micrófono. Cada `abrir()` cierra el anterior y, si el permiso llega después de un `cerrar()`, el micrófono se apaga enseguida: nunca queda abierto sin que se esté dictando.
 
 - Se abre al empezar a dictar y **se cierra al terminar**: detiene las pistas y cierra el `AudioContext`.
 - **Los anillos solo se mueven si el micrófono oye algo.** Es la actualización de la [ADR 0004](decisiones/0004-movimiento-que-cuenta-la-voz.md) en la [0005](decisiones/0005-visualizacion-del-volumen-real.md).

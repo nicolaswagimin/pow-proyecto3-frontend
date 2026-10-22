@@ -18,7 +18,7 @@ Cada versión guarda su **`base_id`**: la versión de la que salió (`null` en l
 | Acción | Qué hace |
 |---|---|
 | **Deshacer** | Va a `base_id` de la actual (de la 3 a la 2, de la 4 a la 1) |
-| **Rehacer** | Va a la versión **más reciente** que salió de la actual (de la 1 a la 4, la última rama que se siguió) |
+| **Rehacer** | Va a la versión **más reciente** que salió de la actual (de la 1 a la 4, la última rama que se siguió). Cuenta el orden de creación, no el id: las no guardadas tienen ids negativos |
 | **Volver a una versión** | Un clic en la línea de tiempo la muestra. No crea nada |
 | **Una orden nueva** | Crea una versión cuyo `base_id` es **la que se está viendo**, aunque no sea la última. Se agrega al final de la lista |
 
@@ -45,8 +45,11 @@ Al pasar de una versión a otra (por una orden, deshacer, rehacer o volver), se 
 - La primera crea el proyecto (`POST /api/proyectos`), y las siguientes se agregan con su `base_id` (`POST /api/proyectos/:id/versiones`).
 - Al guardar, el id temporal se reemplaza por el real, también en los `base_id` que lo apuntaban.
 - Si no se puede guardar, la versión se queda y se ve «Sin guardar» con «Reintentar guardar», que manda las pendientes en orden.
+- Los guardados van **en cola**: «Reintentar guardar» mientras se guarda una orden no duplica proyectos ni versiones.
+- «Nueva página» y abrir otro proyecto cortan la orden en curso (`AbortSignal`). Lo que el servidor responda después de un guardado anterior no se mezcla con la página nueva.
+- Si hay versiones **sin guardar**, «Nueva página» (botón o voz) y abrir un proyecto piden confirmación antes de descartarlas.
 
 ## Pruebas
 
 - `versiones.spec.ts`: deshacer y rehacer en un árbol con ramas, agregar desde una versión vieja sin perder ninguna, ida y vuelta.
-- `estudio-estado.spec.ts`: deshacer, rehacer y volver a una versión, editar desde ahí, el guardado fallido y su reintento.
+- `estudio-estado.spec.ts`: deshacer, rehacer y volver a una versión, editar desde ahí, el guardado fallido y su reintento, dos guardados a la vez, «Nueva página» durante un guardado, la confirmación y el corte de la orden en curso.

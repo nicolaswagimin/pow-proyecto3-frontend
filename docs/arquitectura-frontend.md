@@ -105,7 +105,7 @@ src/
 
 ## Pruebas
 
-`npm test` corre Vitest con jsdom (`@angular/build:unit-test`, configuración en `vitest-base.config.mts`): 107 pruebas. Cubren:
+`npm test` corre Vitest con jsdom (`@angular/build:unit-test`, configuración en `vitest-base.config.mts`): 114 pruebas. Cubren:
 - el saneado (XSS, mXSS, CSS, fuentes, punto fijo);
 - la ventana (sandbox `""`);
 - los bloques a medio llegar y su diferencia;
