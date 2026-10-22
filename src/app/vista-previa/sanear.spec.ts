@@ -114,9 +114,16 @@ describe('documentoVistaPrevia', () => {
 
   it('las hojas de Google Fonts conservan su href (solo se neutralizan los enlaces que navegan)', () => {
     const doc = parsear(
-      documentoVistaPrevia(pagina('<a href="/otra">x</a>', '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter">')),
+      documentoVistaPrevia(
+        pagina(
+          '<a href="/otra">x</a>',
+          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter">',
+        ),
+      ),
     );
-    expect(doc.querySelector('link')?.getAttribute('href')).toBe('https://fonts.googleapis.com/css2?family=Inter');
+    expect(doc.querySelector('link')?.getAttribute('href')).toBe(
+      'https://fonts.googleapis.com/css2?family=Inter',
+    );
     expect(doc.querySelector('a')?.getAttribute('href')).toBe('#');
   });
 
