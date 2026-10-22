@@ -32,20 +32,31 @@ export class NivelMicrofono {
   private stream: { getTracks(): Pista[] } | null = null;
   private contexto: { close(): Promise<void> } | null = null;
   private cuadro = 0;
+  // Cada abrir() y cerrar() cambia la apertura vigente: si el permiso llega después de un cerrar()
+  // (o de otro abrir()), ese stream ya no sirve y se apaga enseguida.
+  private apertura = 0;
 
   async abrir(): Promise<void> {
+    this.cerrar();
+    const mia = this.apertura;
     const medios = (globalThis.navigator as Navigator | undefined)?.mediaDevices;
     if (!medios?.getUserMedia) {
       throw new Error('Este navegador no deja usar el micrófono aquí. Escribe la orden.');
     }
+    let stream: MediaStream;
     try {
-      this.stream = await medios.getUserMedia({
+      stream = await medios.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
       });
     } catch (err) {
       const nombre = (err as { name?: string }).name ?? '';
       throw new Error(MENSAJES[nombre] ?? 'No se pudo abrir el micrófono. Escribe la orden.');
     }
+    if (mia !== this.apertura) {
+      stream.getTracks().forEach((p) => p.stop());
+      return;
+    }
+    this.stream = stream;
     const Contexto =
       (globalThis as { AudioContext?: typeof AudioContext }).AudioContext ??
       (globalThis as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -55,7 +66,7 @@ export class NivelMicrofono {
     const analizador = contexto.createAnalyser();
     analizador.fftSize = 1024;
     analizador.smoothingTimeConstant = 0.6;
-    contexto.createMediaStreamSource(this.stream as MediaStream).connect(analizador);
+    contexto.createMediaStreamSource(stream).connect(analizador);
     const muestras = new Float32Array(analizador.fftSize);
     const medir = () => {
       analizador.getFloatTimeDomainData(muestras);
@@ -69,6 +80,7 @@ export class NivelMicrofono {
   }
 
   cerrar(): void {
+    this.apertura++;
     cancelAnimationFrame(this.cuadro);
     this.stream?.getTracks().forEach((p) => p.stop());
     void this.contexto?.close().catch(() => {});

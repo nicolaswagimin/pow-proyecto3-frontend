@@ -62,6 +62,42 @@ describe('NivelMicrofono', () => {
     expect(nivel.nivel()).toBe(0);
   });
 
+  it('si se cierra antes de que llegue el permiso, el micrófono se apaga al llegar', async () => {
+    const f = medioFalso(0.2);
+    let conceder: (s: typeof f.stream) => void = () => {};
+    vi.stubGlobal('navigator', {
+      mediaDevices: { getUserMedia: () => new Promise((r) => (conceder = r)) },
+    });
+    vi.stubGlobal('AudioContext', f.ContextoFalso);
+    const pedirCuadro = vi.fn(() => 1);
+    vi.stubGlobal('requestAnimationFrame', pedirCuadro);
+    vi.stubGlobal('cancelAnimationFrame', () => {});
+    const nivel = new NivelMicrofono();
+    const abriendo = nivel.abrir();
+    nivel.cerrar();
+    conceder(f.stream);
+    await abriendo;
+    expect(f.pista.detenida).toBe(true);
+    expect(pedirCuadro).not.toHaveBeenCalled();
+  });
+
+  it('abrir otra vez cierra el micrófono anterior', async () => {
+    const a = medioFalso(0.2);
+    const b = medioFalso(0.2);
+    const streams = [a.stream, b.stream];
+    vi.stubGlobal('navigator', { mediaDevices: { getUserMedia: async () => streams.shift() } });
+    vi.stubGlobal('AudioContext', a.ContextoFalso);
+    vi.stubGlobal('requestAnimationFrame', () => 1);
+    vi.stubGlobal('cancelAnimationFrame', () => {});
+    const nivel = new NivelMicrofono();
+    await nivel.abrir();
+    await nivel.abrir();
+    expect(a.pista.detenida).toBe(true);
+    expect(b.pista.detenida).toBe(false);
+    nivel.cerrar();
+    expect(b.pista.detenida).toBe(true);
+  });
+
   it('permiso denegado y sin micrófono dan mensajes claros', async () => {
     for (const [nombre, mensaje] of [
       ['NotAllowedError', /permiso/],
